@@ -1,26 +1,62 @@
-import { DocumentDTO } from "../../application/DTO/DocumentDTO";
+import { DocumentDTO } from "../DTO/DocumentDTO";
 import { DocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
+import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 
 export class DocumentService {
   constructor(private documentRepository: DocumentRepository) {}
 
   async createDocument(documentDTO: DocumentDTO): Promise<void> {
-    // Add business logic for creating a document
-    // and call the repository to save it.
-    await this.documentRepository.create(documentDTO);
+    const documentEntity = new DocumentEntity(
+      documentDTO.id,
+      documentDTO.title,
+      documentDTO.content,
+      documentDTO.author,
+      documentDTO.createdAt,
+      documentDTO.updatedAt
+    );
+    // Add other fields from DTO to entity as needed
+    await this.documentRepository.create(documentEntity);
   }
 
   async getDocumentById(id: string): Promise<DocumentDTO | null> {
-    // Add business logic for retrieving a document by ID
-    // and return the document DTO.
-    const document = await this.documentRepository.findById(id);
-    return document;
-    // if the document is not found, return null
+    const documentEntity = await this.documentRepository.findById(id);
+    if (documentEntity) {
+      return {
+        ...documentEntity,
+      };
+    } else {
+      return null;
+    }
   }
 
-  // Add other methods for updating and deleting documents.
-}
+  async updateDocument(documentDTO: DocumentDTO): Promise<void> {
+    const existingDocument = await this.documentRepository.findById(documentDTO.id);
+    if (!existingDocument) {
+      throw new Error("Document not found");
+    }
+    
+    const updatedDocumentEntity = new DocumentEntity(
+      documentDTO.id,
+      documentDTO.title,
+      documentDTO.content,
+      documentDTO.author,
+      existingDocument.createdAt,
+      new Date() // Update the 'updatedAt' timestamp
+    );
 
+    // Add other fields from DTO to entity as needed
+    await this.documentRepository.update(updatedDocumentEntity);
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    const existingDocument = await this.documentRepository.findById(id);
+    if (!existingDocument) {
+      throw new Error("Document not found");
+    }
+    
+    await this.documentRepository.delete(id);
+  }
+}
 
 /* 
 In the constructor of DocumentService, an instance of DocumentRepository is passed as a parameter.

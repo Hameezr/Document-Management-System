@@ -1,0 +1,22 @@
+import express, { Express } from "express";
+import dotenv from 'dotenv';
+import bodyParser from "body-parser";
+import documentRouter from "./web/routes/documentRouter";
+// import userRouter from "./Routes/userRouter";
+
+dotenv.config();
+
+const app: Express = express();
+const port = process.env.PORT;
+
+app.use(bodyParser.json());
+
+app.use("/documents", documentRouter);
+// app.use("/users", userRouter);
+app.use("/", (req, res)=>{
+  res.send('wront route, sir')
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});

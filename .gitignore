@@ -1,0 +1,36 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore build output
+build/
+
+# Ignore .env file that may contain sensitive information
+.env
+
+# Ignore log files
+*.log
+
+# Ignore compiled TypeScript files
+*.js
+
+# Ignore TypeScript declaration files
+*.d.ts
+
+# Ignore development dependencies installed via npm
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+yarn.lock
+
+# Ignore VSCode settings
+.vscode/
+
+# Ignore Jest cache directory
+__tests__/__snapshots__/
+
+# Ignore coverage reports
+coverage/
+
+# Ignore OS-specific temporary files
+Thumbs.db
+.DS_Store

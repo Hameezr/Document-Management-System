@@ -10,9 +10,7 @@ export class DocumentService {
       documentDTO.id,
       documentDTO.title,
       documentDTO.content,
-      documentDTO.author,
-      documentDTO.createdAt,
-      documentDTO.updatedAt
+      documentDTO.author
     );
     // Add other fields from DTO to entity as needed
     await this.documentRepository.create(documentEntity);
@@ -22,12 +20,18 @@ export class DocumentService {
     const documentEntity = await this.documentRepository.findById(id);
     if (documentEntity) {
       return {
-        ...documentEntity,
+        id: documentEntity.id,
+        title: documentEntity.title,
+        content: documentEntity.content,
+        author: documentEntity.author,
+        createdAt: documentEntity.createdAt,
+        updatedAt: documentEntity.updatedAt,
       };
     } else {
       return null;
     }
   }
+
 
   async updateDocument(documentDTO: DocumentDTO): Promise<void> {
     const existingDocument = await this.documentRepository.findById(documentDTO.id);
@@ -39,13 +43,11 @@ export class DocumentService {
       documentDTO.id,
       documentDTO.title,
       documentDTO.content,
-      documentDTO.author,
-      existingDocument.createdAt,
-      new Date() // Update the 'updatedAt' timestamp
+      documentDTO.author
     );
 
     // Add other fields from DTO to entity as needed
-    await this.documentRepository.update(updatedDocumentEntity);
+    // await this.documentRepository.update(updatedDocumentEntity);
   }
 
   async deleteDocument(id: string): Promise<void> {

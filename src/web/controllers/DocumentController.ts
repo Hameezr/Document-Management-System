@@ -6,26 +6,69 @@ export class DocumentController {
   constructor(private documentService: DocumentService) {}
 
   async createDocument(req: Request, res: Response): Promise<void> {
-    // Parse the request data and create a DocumentDTO.
-    const documentDTO: DocumentDTO = req.body;
-    await this.documentService.createDocument(documentDTO);
-    res.sendStatus(201);
+    try {
+      // Parse the request data and create a DocumentDTO.
+      const documentDTO: DocumentDTO = req.body;
+      await this.documentService.createDocument(documentDTO);
+      res.sendStatus(201);
+    } catch (error) {
+      // Handle error and send appropriate response.
+      console.error("Error creating document:", error);
+      res.status(500).json({ error: "Failed to create document." });
+    }
   }
 
   async getDocumentById(req: Request, res: Response): Promise<void> {
-    const documentId: string = req.params.id;
-    const document = await this.documentService.getDocumentById(documentId);
-    if (document) {
-      res.json(document);
-    } else {
-      res.sendStatus(404);
+    try {
+      const documentId: string = req.params.id;
+      const documentDTO = await this.documentService.getDocumentById(documentId);
+      console.log('doc DTO:', documentDTO)
+      if (documentDTO) {
+        res.json(documentDTO);
+      } else {
+        res.sendStatus(404);
+      }
+    } catch (error) {
+      // Handle error and send appropriate response.
+      console.error("Error retrieving document:", error);
+      res.status(500).json({ error: "Failed to retrieve document." });
     }
   }
 
   // Add other methods for updating and deleting documents.
+  async updateDocument(req: Request, res: Response): Promise<void> {
+    try {
+      const documentDTO: DocumentDTO = req.body;
+      await this.documentService.updateDocument(documentDTO);
+      res.sendStatus(200);
+    } catch (error) {
+      // Handle error and send appropriate response.
+      console.error("Error updating document:", error);
+      res.status(500).json({ error: "Failed to update document." });
+    }
+  }
+
+  async deleteDocument(req: Request, res: Response): Promise<void> {
+    try {
+      const documentId: string = req.params.id;
+      await this.documentService.deleteDocument(documentId);
+      res.sendStatus(200);
+    } catch (error) {
+      // Handle error and send appropriate response.
+      console.error("Error deleting document:", error);
+      res.status(500).json({ error: "Failed to delete document." });
+    }
+  }
 }
 
-/*
+/*In this implementation, the DocumentController receives a DocumentService
+instance through its constructor, allowing it to access the business logic of creating,
+retrieving, updating, and deleting documents. The createDocument, getDocumentById,
+updateDocument, and deleteDocument methods handle the respective HTTP endpoints and
+use the DocumentService to interact with the domain layer and the DocumentEntity to
+perform the necessary operations on documents. Error handling is included to handle
+any potential issues during these operations and return appropriate responses.
+
 DocumentController Class:
 The DocumentController class is defined as an export to be used in other parts of the application.
 It has a constructor that takes a single parameter documentService, which is of type DocumentService.

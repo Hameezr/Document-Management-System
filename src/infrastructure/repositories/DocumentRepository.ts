@@ -16,10 +16,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
   }
   
   async findById(id: string): Promise<DocumentEntity | null> {
-    console.log("documents map:", this.documents);
     const document = this.documents.get(id);
-    console.log("found document:", document);
-
     return document ?? null;
   }
     

@@ -22,7 +22,6 @@ export class DocumentController {
     try {
       const documentId: string = req.params.id;
       const documentDTO = await this.documentService.getDocumentById(documentId);
-      console.log('doc DTO:', documentDTO)
       if (documentDTO) {
         res.json(documentDTO);
       } else {

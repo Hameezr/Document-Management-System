@@ -1,5 +1,5 @@
 export class DocumentEntity {
-    public id: string;
+    private _id: string;
     private _title: string;
     private _content: string;
     private _author: string;
@@ -12,7 +12,7 @@ export class DocumentEntity {
       content: string,
       author: string
     ) {
-      this.id = id;
+      this._id = id;
       this._title = title;
       this._content = content;
       this._author = author;
@@ -20,9 +20,9 @@ export class DocumentEntity {
       this._updatedAt = new Date();
     }
   
-    // get id(): string {
-    //   return this._id;
-    // }
+    get id(): string {
+      return this._id;
+    }
   
     get title(): string {
       return this._title;

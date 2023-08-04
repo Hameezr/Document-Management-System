@@ -11,6 +11,7 @@ export class DocumentController {
     try {
       const { title, tags, author } = req.body;
       const { filename, originalname, mimetype } = req.file || {};
+      const tagsArray = JSON.parse(tags);
       
       const documentDTO: DocumentDTO = {
         id: uuidv4(),
@@ -19,7 +20,7 @@ export class DocumentController {
           fileName: originalname || '',
           fileExtension: filename?.split(".").pop() || "",
           contentType: mimetype || '',
-          tags
+          tags: tagsArray,
         },
         author,
         createdAt: new Date(),
@@ -27,7 +28,7 @@ export class DocumentController {
       };
 
       await this.documentService.createDocument(documentDTO);
-      res.sendStatus(201);
+      res.status(201).json(documentDTO);
     } catch (error) {
       // Handle error and send an appropriate response.
       console.error("Error creating document:", error);

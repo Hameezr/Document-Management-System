@@ -1,9 +1,8 @@
-import { DocumentDTO } from "../../application/DTO/DocumentDTO";
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 
 export interface DocumentRepository {
-  create(DocumentEntity: DocumentEntity): Promise<void>;
-  findById(id: string): Promise<DocumentDTO | null>;
+  create(documentEntity: DocumentEntity): Promise<void>;
+  findById(id: string): Promise<DocumentEntity | null>;
   update(documentEntity: DocumentEntity): Promise<void>;
   delete(id: string): Promise<void>;
 }
@@ -12,6 +11,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
   private documents: Map<string, DocumentEntity> = new Map();
 
   async create(documentEntity: DocumentEntity): Promise<void> {
+    console.log('Doc Repo is called, id:', documentEntity.id)
     this.documents.set(documentEntity.id, documentEntity);
   }
 
@@ -25,8 +25,12 @@ export class InMemoryDocumentRepository implements DocumentRepository {
     if (!existingDocument) {
       throw new Error("Document not found");
     }
-    existingDocument.updateContent(documentEntity.content);
-    this.documents.set(documentEntity.id, existingDocument);
+
+    // Use the update methods to modify the existingDocument
+    existingDocument.updateTitle(documentEntity.title);
+    existingDocument.updateFile(documentEntity.file);
+
+    this.documents.set(existingDocument.id, existingDocument);
   }
 
   async delete(id: string): Promise<void> {

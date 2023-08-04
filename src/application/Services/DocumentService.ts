@@ -6,13 +6,8 @@ export class DocumentService {
   constructor(private documentRepository: DocumentRepository) {}
 
   async createDocument(documentDTO: DocumentDTO): Promise<void> {
-    const documentEntity = new DocumentEntity(
-      documentDTO.id,
-      documentDTO.title,
-      documentDTO.content,
-      documentDTO.author
-    );
-    // Add other fields from DTO to entity as needed
+    const documentEntity = DocumentEntity.fromDTO(documentDTO);
+    console.log('DocServices:', documentEntity)
     await this.documentRepository.create(documentEntity);
   }
 
@@ -22,7 +17,12 @@ export class DocumentService {
       return {
         id: documentEntity.id,
         title: documentEntity.title,
-        content: documentEntity.content,
+        file: {
+          fileName: documentEntity.file.fileName,
+          fileExtension: documentEntity.file.fileExtension,
+          contentType: documentEntity.file.contentType,
+          tags: [...documentEntity.file.tags], // spread the tags array to create a new array
+        },
         author: documentEntity.author,
         createdAt: documentEntity.createdAt,
         updatedAt: documentEntity.updatedAt,
@@ -30,6 +30,7 @@ export class DocumentService {
     } else {
       return null;
     }
+  
   }
 
 
@@ -39,12 +40,12 @@ export class DocumentService {
       throw new Error("Document not found");
     }
     
-    const updatedDocumentEntity = new DocumentEntity(
-      documentDTO.id,
-      documentDTO.title,
-      documentDTO.content,
-      documentDTO.author
-    );
+    // const updatedDocumentEntity = new DocumentEntity(
+    //   documentDTO.id,
+    //   documentDTO.title,
+    //   documentDTO.content,
+    //   documentDTO.author
+    // );
 
     // Add other fields from DTO to entity as needed
     // await this.documentRepository.update(updatedDocumentEntity);

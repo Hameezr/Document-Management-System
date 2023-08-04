@@ -2,22 +2,42 @@ import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
 
+import { v4 as uuidv4 } from 'uuid';
+
 export class DocumentController {
   constructor(private documentService: DocumentService) {}
 
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
       // Parse the request data and create a DocumentDTO.
-      const documentDTO: DocumentDTO = req.body;
+      const { title, tags, author } = req.body;
+      const { filename, originalname, mimetype } = req.file || {}; // Extract file data from req.file
+      
+      console.log('req.body', req.body);
+      console.log('req.file', req.file);
+      
+      const documentDTO: DocumentDTO = {
+        id: uuidv4(),
+        title,
+        file: {
+          fileName: originalname || '',
+          fileExtension: filename?.split(".").pop() || "",
+          contentType: mimetype || '',
+          tags
+        },
+        author,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
       await this.documentService.createDocument(documentDTO);
       res.sendStatus(201);
     } catch (error) {
-      // Handle error and send appropriate response.
+      // Handle error and send an appropriate response.
       console.error("Error creating document:", error);
       res.status(500).json({ error: "Failed to create document." });
     }
   }
-
   async getDocumentById(req: Request, res: Response): Promise<void> {
     try {
       const documentId: string = req.params.id;

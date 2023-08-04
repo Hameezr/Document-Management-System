@@ -13,7 +13,6 @@ const documentRouter = Router();
 const upload = multer({ dest: "uploads/" });
 documentRouter.post("/", upload.single("file"), (req, res) => documentController.createDocument(req, res));
 // documentRouter.post("/", (req, res) => documentController.createDocument(req, res));
-// documentRouter.get("/", (req, res) => documentController.getAllDocuments(req, res)); // Route for getting all documents
 documentRouter.get("/:id", (req, res) => documentController.getDocumentById(req, res)); // Route for getting document by ID
 
 

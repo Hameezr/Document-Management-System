@@ -7,7 +7,6 @@ export class DocumentService {
 
   async createDocument(documentDTO: DocumentDTO): Promise<void> {
     const documentEntity = DocumentEntity.fromDTO(documentDTO);
-    console.log('DocServices:', documentEntity)
     await this.documentRepository.create(documentEntity);
   }
 

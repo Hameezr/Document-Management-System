@@ -9,12 +9,8 @@ export class DocumentController {
 
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
-      // Parse the request data and create a DocumentDTO.
       const { title, tags, author } = req.body;
-      const { filename, originalname, mimetype } = req.file || {}; // Extract file data from req.file
-      
-      console.log('req.body', req.body);
-      console.log('req.file', req.file);
+      const { filename, originalname, mimetype } = req.file || {};
       
       const documentDTO: DocumentDTO = {
         id: uuidv4(),

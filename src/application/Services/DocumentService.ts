@@ -7,6 +7,7 @@ export class DocumentService {
 
   async createDocument(documentDTO: DocumentDTO): Promise<void> {
     const documentEntity = DocumentEntity.fromDTO(documentDTO);
+    console.log('docServices: ', documentEntity)
     await this.documentRepository.create(documentEntity);
   }
 
@@ -20,7 +21,8 @@ export class DocumentService {
           fileName: documentEntity.file.fileName,
           fileExtension: documentEntity.file.fileExtension,
           contentType: documentEntity.file.contentType,
-          tags: [...documentEntity.file.tags], // spread the tags array to create a new array
+          tags: [...documentEntity.file.tags],
+          metadata: 'tempMetaData'
         },
         author: documentEntity.author,
         createdAt: documentEntity.createdAt,

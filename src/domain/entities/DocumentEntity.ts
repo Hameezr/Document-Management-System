@@ -8,6 +8,7 @@ export class DocumentEntity {
     fileExtension: string;
     contentType: string;
     tags: { key: string; name: string }[];
+    metadata: any;
   };
   private _author: string;
   private _createdAt: Date;
@@ -21,6 +22,7 @@ export class DocumentEntity {
       fileExtension: string;
       contentType: string;
       tags: { key: string; name: string }[];
+      metadata: any,
     },
     author: string
   ) {
@@ -41,6 +43,7 @@ export class DocumentEntity {
   }
 
   get file(): {
+    [x: string]: any;
     fileName: string;
     fileExtension: string;
     contentType: string;
@@ -71,6 +74,7 @@ export class DocumentEntity {
     fileExtension: string;
     contentType: string;
     tags: { key: string; name: string }[];
+    metadata: any,
   }): void {
     this._file = file;
     this._updatedAt = new Date();

@@ -6,6 +6,7 @@ export interface DocumentDTO {
     fileExtension: string;
     contentType: string;
     tags: { key: string; name: string }[];
+    metadata: any;
   };
   author: string;
   createdAt: Date;

@@ -11,7 +11,7 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-app.use("/documents", documentRouter);
+app.use("/docs", documentRouter);
 // app.use("/users", userRouter);
 
 app.use("/", (req, res)=>{

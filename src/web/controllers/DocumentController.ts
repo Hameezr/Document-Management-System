@@ -1,40 +1,87 @@
 import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
+import { MetaDataService } from "../../application/Services/MetaDataService";
 
 import { v4 as uuidv4 } from 'uuid';
 
 export class DocumentController {
-  constructor(private documentService: DocumentService) {}
-
+  constructor(private documentService: DocumentService, private metaDataService: MetaDataService) {}
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
-      const { title, tags, author } = req.body;
-      const { filename, originalname, mimetype } = req.file || {};
-      const tagsArray = JSON.parse(tags);
-      
-      const documentDTO: DocumentDTO = {
-        id: uuidv4(),
-        title,
-        file: {
-          fileName: originalname || '',
-          fileExtension: filename?.split(".").pop() || "",
-          contentType: mimetype || '',
-          tags: tagsArray,
-        },
-        author,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
+      const documentDTO = await this.processFile(req);
+      console.log('docController: ', documentDTO)
       await this.documentService.createDocument(documentDTO);
       res.status(201).json(documentDTO);
     } catch (error) {
-      // Handle error and send an appropriate response.
       console.error("Error creating document:", error);
       res.status(500).json({ error: "Failed to create document." });
     }
   }
+
+  async createAudio(req: Request, res: Response): Promise<void> {
+    try {
+      const documentDTO = await this.processFile(req);
+      // Additional audio-specific processing if needed
+      console.log('docController: ', documentDTO)
+      await this.documentService.createDocument(documentDTO);
+      res.status(201).json(documentDTO);
+    } catch (error) {
+      console.error("Error creating audio document:", error);
+      res.status(500).json({ error: "Failed to create audio document." });
+    }
+  }
+
+  async createVideo(req: Request, res: Response): Promise<void> {
+    try {
+      const documentDTO = await this.processFile(req);
+      // Additional video-specific processing if needed
+      console.log('docController: ', documentDTO)
+      await this.documentService.createDocument(documentDTO);
+      res.status(201).json(documentDTO);
+    } catch (error) {
+      console.error("Error creating video document:", error);
+      res.status(500).json({ error: "Failed to create video document." });
+    }
+  }
+
+  async createImage(req: Request, res: Response): Promise<void> {
+    try {
+      const documentDTO = await this.processFile(req);
+      // Additional image-specific processing if needed
+      console.log('docController: ', documentDTO)
+      await this.documentService.createDocument(documentDTO);
+      res.status(201).json(documentDTO);
+    } catch (error) {
+      console.error("Error creating image document:", error);
+      res.status(500).json({ error: "Failed to create image document." });
+    }
+  }
+
+  private async processFile(req: Request): Promise<DocumentDTO> {
+    const { title, tags, author } = req.body;
+    const { filename, originalname, mimetype } = req.file || {};
+    const tagsArray = JSON.parse(tags);
+    const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
+    const metadataSchema = this.metaDataService.getMetadataSchema(fileType);
+    const processedMetadata = this.metaDataService.processMetadata(fileType, req.body.metadata);
+
+    return {
+      id: uuidv4(),
+      title,
+      file: {
+        fileName: originalname || '',
+        fileExtension: filename?.split(".").pop() || "",
+        contentType: mimetype || '',
+        tags: tagsArray,
+        metadata: processedMetadata,
+      },
+      author,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
   async getDocumentById(req: Request, res: Response): Promise<void> {
     try {
       const documentId: string = req.params.id;

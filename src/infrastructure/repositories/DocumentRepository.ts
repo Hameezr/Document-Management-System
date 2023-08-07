@@ -11,6 +11,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
   private documents: Map<string, DocumentEntity> = new Map();
 
   async create(documentEntity: DocumentEntity): Promise<void> {
+    console.log("documentRepo", documentEntity)
     this.documents.set(documentEntity.id, documentEntity);
   }
 
@@ -27,7 +28,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
 
     // Use the update methods to modify the existingDocument
     existingDocument.updateTitle(documentEntity.title);
-    existingDocument.updateFile(documentEntity.file);
+    // existingDocument.updateFile(documentEntity.file);
 
     this.documents.set(existingDocument.id, existingDocument);
   }

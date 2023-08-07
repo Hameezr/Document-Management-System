@@ -10,7 +10,6 @@ export class DocumentController {
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
-      console.log('docController: ', documentDTO)
       await this.documentService.createDocument(documentDTO);
       res.status(201).json(documentDTO);
     } catch (error) {
@@ -23,7 +22,6 @@ export class DocumentController {
     try {
       const documentDTO = await this.processFile(req);
       // Additional audio-specific processing if needed
-      console.log('docController: ', documentDTO)
       await this.documentService.createDocument(documentDTO);
       res.status(201).json(documentDTO);
     } catch (error) {
@@ -36,7 +34,6 @@ export class DocumentController {
     try {
       const documentDTO = await this.processFile(req);
       // Additional video-specific processing if needed
-      console.log('docController: ', documentDTO)
       await this.documentService.createDocument(documentDTO);
       res.status(201).json(documentDTO);
     } catch (error) {
@@ -49,7 +46,6 @@ export class DocumentController {
     try {
       const documentDTO = await this.processFile(req);
       // Additional image-specific processing if needed
-      console.log('docController: ', documentDTO)
       await this.documentService.createDocument(documentDTO);
       res.status(201).json(documentDTO);
     } catch (error) {

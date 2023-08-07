@@ -24,4 +24,3 @@ export const AudioMetadataSchema = {
     resolution: "string",
     photographer: "string",
   };
-  

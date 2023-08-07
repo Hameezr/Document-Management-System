@@ -11,7 +11,6 @@ export class InMemoryDocumentRepository implements DocumentRepository {
   private documents: Map<string, DocumentEntity> = new Map();
 
   async create(documentEntity: DocumentEntity): Promise<void> {
-    console.log("documentRepo", documentEntity)
     this.documents.set(documentEntity.id, documentEntity);
   }
 

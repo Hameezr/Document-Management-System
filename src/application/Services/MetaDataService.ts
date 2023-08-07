@@ -17,6 +17,7 @@ export class MetaDataService {
   }
 
   processMetadata(fileType: string, metadata: any): any {
+    console.log(fileType)
     switch (fileType) {
       case "audio":
         // Process audio metadata as needed
@@ -24,7 +25,7 @@ export class MetaDataService {
       case "video":
         // Process video metadata as needed
         return metadata;
-      case "document":
+      case "application":
         // Process document metadata as needed
         return metadata;
       case "image":

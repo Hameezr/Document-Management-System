@@ -34,3 +34,5 @@ coverage/
 # Ignore OS-specific temporary files
 Thumbs.db
 .DS_Store
+
+uploads/

@@ -24,10 +24,10 @@ export class InMemoryDocumentRepository implements DocumentRepository {
     if (!existingDocument) {
       throw new Error("Document not found");
     }
-
-    // Use the update methods to modify the existingDocument
     existingDocument.updateTitle(documentEntity.title);
-    // existingDocument.updateFile(documentEntity.file);
+    if (documentEntity.file) {
+      existingDocument.updateFile(documentEntity.file.metadata);
+    }
 
     this.documents.set(existingDocument.id, existingDocument);
   }
@@ -40,4 +40,5 @@ export class InMemoryDocumentRepository implements DocumentRepository {
 
     this.documents.delete(id);
   }
+
 }

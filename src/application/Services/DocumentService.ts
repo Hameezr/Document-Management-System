@@ -1,11 +1,15 @@
 import { DocumentDTO } from "../DTO/DocumentDTO";
 import { DocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
+import { MetadataService } from "./MetadataService";
 
 export class DocumentService {
-  constructor(private documentRepository: DocumentRepository) {}
+  constructor(private documentRepository: DocumentRepository, private metadataService: MetadataService) {}
 
-  async createDocument(documentDTO: DocumentDTO): Promise<void> {
+  async createDocument(documentDTO: DocumentDTO, metadataType: string, attributes: string[]): Promise<void> {
+    console.log('service:' , metadataType)
+    const metadata = await this.metadataService.createSchema(metadataType, attributes);
+    documentDTO.file.metadata = metadata;
     const documentEntity = DocumentEntity.fromDTO(documentDTO);
     await this.documentRepository.create(documentEntity);
   }
@@ -13,6 +17,10 @@ export class DocumentService {
   async getDocumentById(id: string): Promise<DocumentDTO | null> {
     const documentEntity = await this.documentRepository.findById(id);
     if (documentEntity) {
+      if (documentEntity.file && documentEntity.file.metadata) {
+        const metadata = await this.metadataService.getMetadataById(documentEntity.file.metadata._id);
+        documentEntity.file.metadata = metadata;
+    }
       return {
         id: documentEntity.id,
         title: documentEntity.title,
@@ -20,7 +28,8 @@ export class DocumentService {
           fileName: documentEntity.file.fileName,
           fileExtension: documentEntity.file.fileExtension,
           contentType: documentEntity.file.contentType,
-          tags: [...documentEntity.file.tags]
+          tags: [...documentEntity.file.tags],
+          metadata: documentEntity.file.metadata
         },
         author: documentEntity.author,
         createdAt: documentEntity.createdAt,

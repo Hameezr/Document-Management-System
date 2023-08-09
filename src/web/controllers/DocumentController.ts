@@ -9,7 +9,9 @@ export class DocumentController {
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
-      await this.documentService.createDocument(documentDTO);
+      const metadataType: string = req.body.metadataType;
+      const attributes: string[] = req.body.attributes;
+      await this.documentService.createDocument(documentDTO, metadataType, attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating document:", error);
@@ -20,8 +22,10 @@ export class DocumentController {
   async createAudio(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
+      const metadataType: string = req.body.metadataType;
+      const attributes: string[] = req.body.attributes;
       // Additional audio-specific processing if needed
-      await this.documentService.createDocument(documentDTO);
+      await this.documentService.createDocument(documentDTO, metadataType, attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating audio document:", error);
@@ -32,8 +36,10 @@ export class DocumentController {
   async createVideo(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
+      const metadataType: string = req.body.metadataType;
+      const attributes: string[] = req.body.attributes;
       // Additional video-specific processing if needed
-      await this.documentService.createDocument(documentDTO);
+      await this.documentService.createDocument(documentDTO, metadataType, attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating video document:", error);
@@ -44,8 +50,12 @@ export class DocumentController {
   async createImage(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
+      const metadata = JSON.parse(req.body.metadata);
+      const metadataType: string = metadata.type;
+      const attributes: string[] = metadata.attributes;
+      console.log('req.body', JSON.parse(req.body.metadata))
       // Additional image-specific processing if needed
-      await this.documentService.createDocument(documentDTO);
+      await this.documentService.createDocument(documentDTO, metadataType, attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating image document:", error);
@@ -58,6 +68,7 @@ export class DocumentController {
     const { filename, originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
+    const metadata = req.body.metadata ? JSON.parse(req.body.metadata) : null;
 
     return {
       id: uuidv4(),
@@ -66,7 +77,8 @@ export class DocumentController {
         fileName: originalname || '',
         fileExtension: filename?.split(".").pop() || "",
         contentType: mimetype || '',
-        tags: tagsArray
+        tags: tagsArray,
+        metadata
       },
       author,
       createdAt: new Date(),

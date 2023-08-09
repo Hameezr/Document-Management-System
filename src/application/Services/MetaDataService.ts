@@ -1,5 +1,5 @@
 import { MetaDataSchema, MetaDataRepository } from "../../infrastructure/repositories/MetaDataRepository";
-
+import { MetadataEntity } from "../../domain/entities/MetaDataEntity";
 export class MetaDataService {
   constructor(private metaDataRepository: MetaDataRepository) {}
 

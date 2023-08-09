@@ -1,4 +1,3 @@
-// File: MetaDataController.ts
 import { Request, Response } from "express";
 import { MetaDataService } from "../../application/Services/MetaDataService";
 

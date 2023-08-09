@@ -1,4 +1,5 @@
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
+import { MetadataEntity } from "./MetaDataEntity";
 
 export class DocumentEntity {
   private _id: string;
@@ -8,7 +9,7 @@ export class DocumentEntity {
     fileExtension: string;
     contentType: string;
     tags: { key: string; name: string }[];
-    metadata: any;
+    metadata: MetadataEntity;
   };
   private _author: string;
   private _createdAt: Date;
@@ -22,7 +23,7 @@ export class DocumentEntity {
       fileExtension: string;
       contentType: string;
       tags: { key: string; name: string }[];
-      metadata: any,
+      metadata: MetadataEntity,
     },
     author: string
   ) {
@@ -74,7 +75,7 @@ export class DocumentEntity {
     fileExtension: string;
     contentType: string;
     tags: { key: string; name: string }[];
-    metadata: any,
+    metadata: MetadataEntity,
   }): void {
     this._file = file;
     this._updatedAt = new Date();

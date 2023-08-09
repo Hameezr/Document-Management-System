@@ -1,12 +1,15 @@
 import { DocumentDTO } from "../DTO/DocumentDTO";
 import { DocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
+import { MetadataEntity } from "../../domain/entities/MetaDataEntity";
 
 export class DocumentService {
   constructor(private documentRepository: DocumentRepository) {}
 
   async createDocument(documentDTO: DocumentDTO): Promise<void> {
-    const documentEntity = DocumentEntity.fromDTO(documentDTO);
+    const metadataEntity = new MetadataEntity(documentDTO.file.metadata);
+    const documentEntity = DocumentEntity.fromDTO({...documentDTO, file: {...documentDTO.file, metadata: metadataEntity}});
+    // const documentEntity = DocumentEntity.fromDTO(documentDTO);
     await this.documentRepository.create(documentEntity);
   }
 
@@ -30,7 +33,6 @@ export class DocumentService {
     } else {
       return null;
     }
-  
   }
 
 

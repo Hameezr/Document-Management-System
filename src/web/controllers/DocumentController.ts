@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
 import { MetaDataService } from "../../application/Services/MetaDataService";
+import { MetadataEntity } from "../../domain/entities/MetaDataEntity";
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -62,6 +63,9 @@ export class DocumentController {
     const metadataSchema = this.metaDataService.getMetadataSchema(fileType);
     const processedMetadata = this.metaDataService.processMetadata(fileType, req.body.metadata);
 
+    const metadataDTO = { data: processedMetadata };
+    const metadataData = await metadataDTO.data;
+
     return {
       id: uuidv4(),
       title,
@@ -70,7 +74,7 @@ export class DocumentController {
         fileExtension: filename?.split(".").pop() || "",
         contentType: mimetype || '',
         tags: tagsArray,
-        metadata: processedMetadata,
+        metadata: new MetadataEntity(metadataData),
       },
       author,
       createdAt: new Date(),

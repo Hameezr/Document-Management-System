@@ -1,13 +1,11 @@
 import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
-import { MetaDataService } from "../../application/Services/MetaDataService";
-import { MetadataEntity } from "../../domain/entities/MetaDataEntity";
 
 import { v4 as uuidv4 } from 'uuid';
 
 export class DocumentController {
-  constructor(private documentService: DocumentService, private metaDataService: MetaDataService) {}
+  constructor(private documentService: DocumentService) {}
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
@@ -60,11 +58,6 @@ export class DocumentController {
     const { filename, originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
-    const metadataSchema = this.metaDataService.getMetadataSchema(fileType);
-    const processedMetadata = this.metaDataService.processMetadata(fileType, req.body.metadata);
-
-    const metadataDTO = { data: processedMetadata };
-    const metadataData = await metadataDTO.data;
 
     return {
       id: uuidv4(),
@@ -73,8 +66,7 @@ export class DocumentController {
         fileName: originalname || '',
         fileExtension: filename?.split(".").pop() || "",
         contentType: mimetype || '',
-        tags: tagsArray,
-        metadata: new MetadataEntity(metadataData),
+        tags: tagsArray
       },
       author,
       createdAt: new Date(),

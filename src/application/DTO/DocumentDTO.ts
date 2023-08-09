@@ -1,5 +1,3 @@
-import { MetadataEntity } from "../../domain/entities/MetaDataEntity";
-
 export interface DocumentDTO {
   id: string;
   title: string;
@@ -8,7 +6,6 @@ export interface DocumentDTO {
     fileExtension: string;
     contentType: string;
     tags: { key: string; name: string }[];
-    metadata: MetadataEntity;
   };
   author: string;
   createdAt: Date;

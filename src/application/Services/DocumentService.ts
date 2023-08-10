@@ -4,10 +4,9 @@ import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { MetadataService } from "./MetadataService";
 
 export class DocumentService {
-  constructor(private documentRepository: DocumentRepository, private metadataService: MetadataService) {}
+  constructor(private documentRepository: DocumentRepository, private metadataService: MetadataService) { }
 
   async createDocument(documentDTO: DocumentDTO, metadataType: string, attributes: string[]): Promise<void> {
-    console.log('service:' , metadataType)
     const metadata = await this.metadataService.createSchema(metadataType, attributes);
     documentDTO.file.metadata = metadata;
     const documentEntity = DocumentEntity.fromDTO(documentDTO);
@@ -17,10 +16,10 @@ export class DocumentService {
   async getDocumentById(id: string): Promise<DocumentDTO | null> {
     const documentEntity = await this.documentRepository.findById(id);
     if (documentEntity) {
-      if (documentEntity.file && documentEntity.file.metadata) {
-        const metadata = await this.metadataService.getMetadataById(documentEntity.file.metadata._id);
-        documentEntity.file.metadata = metadata;
-    }
+      // if (documentEntity.file && documentEntity.file.metadata) {
+      //   const metadata = await this.metadataService.getMetadataById(documentEntity.file.metadata._id);
+      //   documentEntity.file.metadata = metadata;
+      // }
       return {
         id: documentEntity.id,
         title: documentEntity.title,
@@ -46,7 +45,7 @@ export class DocumentService {
     if (!existingDocument) {
       throw new Error("Document not found");
     }
-    
+
     // const updatedDocumentEntity = new DocumentEntity(
     //   documentDTO.id,
     //   documentDTO.title,
@@ -63,7 +62,7 @@ export class DocumentService {
     if (!existingDocument) {
       throw new Error("Document not found");
     }
-    
+
     await this.documentRepository.delete(id);
   }
 }

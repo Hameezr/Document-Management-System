@@ -11,7 +11,7 @@ const metadataRouter = Router();
 
 metadataRouter.post("/", (req, res) => metadataController.createMetadataSchema(req, res));
 metadataRouter.get("/:type", (req, res) => metadataController.getMetadataSchemaByType(req, res));
-metadataRouter.put("/:type", (req, res) => metadataController.updateMetadataSchema(req, res));
-metadataRouter.delete("/:type", (req, res) => metadataController.deleteMetadataSchema(req, res));
+// metadataRouter.put("/:type", (req, res) => metadataController.updateMetadataSchema(req, res));
+// metadataRouter.delete("/:type", (req, res) => metadataController.deleteMetadataSchema(req, res));
 
 export default metadataRouter;

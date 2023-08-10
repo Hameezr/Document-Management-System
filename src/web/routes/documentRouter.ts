@@ -15,7 +15,8 @@ const documentController = new DocumentController(documentService); // Passing t
 
 const documentRouter = Router();
 
-const upload = multer({ dest: "uploads/" });;
+const storage = multer.memoryStorage(); // store the file in memory
+const upload = multer({ dest: "uploads/", storage: storage });;
 documentRouter.post("/document", upload.single("file"), (req, res) => documentController.createDocument(req, res));
 documentRouter.post("/audio", upload.single("file"), (req, res) => documentController.createAudio(req, res));
 documentRouter.post("/video", upload.single("file"), (req, res) => documentController.createVideo(req, res));

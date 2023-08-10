@@ -9,7 +9,7 @@ export class DocumentEntity {
         fileExtension: string;
         contentType: string;
         tags: { key: string; name: string }[];
-        metadata: MetadataSchema;
+        metadata: MetadataSchema; // value Object
     };
     private _author: string;
     private _createdAt: Date;
@@ -18,12 +18,13 @@ export class DocumentEntity {
     constructor(
         id: string,
         title: string,
+        // value object
         file: {
             fileName: string;
             fileExtension: string;
             contentType: string;
             tags: { key: string; name: string }[];
-            metadata: MetadataSchema
+            metadata: MetadataSchema // value object
         },
         author: string
     ) {

@@ -30,25 +30,25 @@ export class MetadataSchemaController {
     }
   }
 
-  async updateMetadataSchema(req: Request, res: Response): Promise<void> {
-    try {
-      const { type, attributes } = req.body;
-      await this.metadataService.updateMetadataSchema(type, attributes);
-      res.status(200).json({ message: "Metadata schema updated successfully." });
-    } catch (error) {
-      console.error("Error updating metadata schema:", error);
-      res.status(500).json({ error: "Failed to update metadata schema." });
-    }
-  }
+//   async updateMetadataSchema(req: Request, res: Response): Promise<void> {
+//     try {
+//       const { type, attributes } = req.body;
+//       await this.metadataService.updateMetadataSchema(type, attributes);
+//       res.status(200).json({ message: "Metadata schema updated successfully." });
+//     } catch (error) {
+//       console.error("Error updating metadata schema:", error);
+//       res.status(500).json({ error: "Failed to update metadata schema." });
+//     }
+//   }
 
-  async deleteMetadataSchema(req: Request, res: Response): Promise<void> {
-    try {
-      const type = req.params.type;
-      await this.metadataService.deleteMetadataSchema(type);
-      res.status(200).json({ message: "Metadata schema deleted successfully." });
-    } catch (error) {
-      console.error("Error deleting metadata schema:", error);
-      res.status(500).json({ error: "Failed to delete metadata schema." });
-    }
-  }
+//   async deleteMetadataSchema(req: Request, res: Response): Promise<void> {
+//     try {
+//       const type = req.params.type;
+//       await this.metadataService.deleteMetadataSchema(type);
+//       res.status(200).json({ message: "Metadata schema deleted successfully." });
+//     } catch (error) {
+//       console.error("Error deleting metadata schema:", error);
+//       res.status(500).json({ error: "Failed to delete metadata schema." });
+//     }
+//   }
 }

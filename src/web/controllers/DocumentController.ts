@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
+import { MetadataSchema } from "../../domain/entities/MetadataEntity";
+import sharp from 'sharp';
 
 import { v4 as uuidv4 } from 'uuid';
 
 export class DocumentController {
-  constructor(private documentService: DocumentService) {}
+  constructor(private documentService: DocumentService) { }
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
@@ -49,13 +51,14 @@ export class DocumentController {
 
   async createImage(req: Request, res: Response): Promise<void> {
     try {
+
       const documentDTO = await this.processFile(req);
-      const metadata = JSON.parse(req.body.metadata);
-      const metadataType: string = metadata.type;
-      const attributes: string[] = metadata.attributes;
-      console.log('req.body', JSON.parse(req.body.metadata))
+      // console.log(documentDTO.file.metadata)
+      // const metadata = JSON.parse(req.body?.metadata);
+      // const metadataType: string = metadata.type;
+      // const attributes: string[] = metadata.attributes;
       // Additional image-specific processing if needed
-      await this.documentService.createDocument(documentDTO, metadataType, attributes);
+      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating image document:", error);
@@ -68,7 +71,73 @@ export class DocumentController {
     const { filename, originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
-    const metadata = req.body.metadata ? JSON.parse(req.body.metadata) : null;
+    // const metadata = req.body.metadata ? JSON.parse(req.body.metadata) : null;
+
+    // let metadata: MetadataSchema;
+    // if (req.body.metadata) {
+    //   const parsedMetadata = JSON.parse(req.body.metadata);
+    //   metadata = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
+    // } else {
+    //   // Dynamically create metadata based on file type
+    //   console.log('im here')
+    //   metadata = MetadataSchema.createFromAttributes(fileType);
+    // }
+
+    let metadata: MetadataSchema;
+    if (req.body.metadata) {
+      const parsedMetadata = JSON.parse(req.body.metadata);
+      metadata = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
+    } else {
+      // Placeholder for dynamically determined attributes
+      let dynamicAttributes = {};
+
+      // Image metadata extraction
+      if (fileType === 'image') {
+        const imageMetadata = await sharp(req.file?.buffer).metadata();
+        dynamicAttributes = {
+          resolution: `${imageMetadata.width}x${imageMetadata.height}`,
+          colorDepth: `${imageMetadata.channels} channels`,
+          format: imageMetadata.format
+        };
+      }
+
+      // Audio metadata extraction
+      // if (fileType === 'audio') {
+      //     const audioMetadata = await musicMetadata.parseBuffer(req.file.buffer);
+      //     dynamicAttributes = {
+      //         duration: audioMetadata.format.duration,
+      //         bitrate: audioMetadata.format.bitrate,
+      //         channels: audioMetadata.format.numberOfChannels
+      //     };
+      // }
+
+      // Video metadata extraction - This is asynchronous with a callback, you might need adjustments
+      // if (fileType === 'video') {
+      //   const videoInfo = await new Promise((resolve, reject) => {
+      //     ffmpeg.ffprobe(req.file.path, (err, info) => {
+      //       if (err) reject(err);
+      //       resolve(info);
+      //     });
+      //   });
+      //   dynamicAttributes = {
+      //     resolution: `${videoInfo.streams[0].width}x${videoInfo.streams[0].height}`,
+      //     fps: videoInfo.streams[0].r_frame_rate,
+      //     duration: videoInfo.format.duration
+      //   };
+      // }
+
+      // PDF metadata extraction
+      // if (fileType === 'application' && req.file.mimetype === 'application/pdf') {
+      //   const data = await pdf(req.file.buffer);
+      //   dynamicAttributes = {
+      //     pages: data.numpages,
+      //     version: data.info.PDFFormatVersion
+      //   };
+      // }
+
+      // Finally, create the MetadataSchema
+      metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes);
+    }
 
     return {
       id: uuidv4(),

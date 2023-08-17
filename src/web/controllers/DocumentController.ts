@@ -2,9 +2,14 @@ import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
 import { MetadataSchema } from "../../domain/entities/MetadataEntity";
+
 import sharp from 'sharp';
+import { parseBuffer } from 'music-metadata';
+import ffmpeg from 'fluent-ffmpeg';
+import pdf from 'pdf-parse';
 
 import { v4 as uuidv4 } from 'uuid';
+
 
 export class DocumentController {
   constructor(private documentService: DocumentService) { }
@@ -24,10 +29,8 @@ export class DocumentController {
   async createAudio(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
-      const metadataType: string = req.body.metadataType;
-      const attributes: string[] = req.body.attributes;
       // Additional audio-specific processing if needed
-      await this.documentService.createDocument(documentDTO, metadataType, attributes);
+      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating audio document:", error);
@@ -53,11 +56,6 @@ export class DocumentController {
     try {
 
       const documentDTO = await this.processFile(req);
-      // console.log(documentDTO.file.metadata)
-      // const metadata = JSON.parse(req.body?.metadata);
-      // const metadataType: string = metadata.type;
-      // const attributes: string[] = metadata.attributes;
-      // Additional image-specific processing if needed
       await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
@@ -71,17 +69,6 @@ export class DocumentController {
     const { filename, originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
-    // const metadata = req.body.metadata ? JSON.parse(req.body.metadata) : null;
-
-    // let metadata: MetadataSchema;
-    // if (req.body.metadata) {
-    //   const parsedMetadata = JSON.parse(req.body.metadata);
-    //   metadata = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
-    // } else {
-    //   // Dynamically create metadata based on file type
-    //   console.log('im here')
-    //   metadata = MetadataSchema.createFromAttributes(fileType);
-    // }
 
     let metadata: MetadataSchema;
     if (req.body.metadata) {
@@ -100,16 +87,15 @@ export class DocumentController {
           format: imageMetadata.format
         };
       }
-
       // Audio metadata extraction
-      // if (fileType === 'audio') {
-      //     const audioMetadata = await musicMetadata.parseBuffer(req.file.buffer);
-      //     dynamicAttributes = {
-      //         duration: audioMetadata.format.duration,
-      //         bitrate: audioMetadata.format.bitrate,
-      //         channels: audioMetadata.format.numberOfChannels
-      //     };
-      // }
+      if (fileType === 'audio' && req.file?.buffer) {
+        const audioMetadata = await parseBuffer(req.file?.buffer, 'audio/mpeg');
+        dynamicAttributes = {
+            duration: audioMetadata.format.duration,
+            bitrate: audioMetadata.format.bitrate,
+            channels: audioMetadata.format.numberOfChannels
+        };
+    }
 
       // Video metadata extraction - This is asynchronous with a callback, you might need adjustments
       // if (fileType === 'video') {

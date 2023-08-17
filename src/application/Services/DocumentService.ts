@@ -7,8 +7,6 @@ export class DocumentService {
   constructor(private documentRepository: DocumentRepository, private metadataService: MetadataService) { }
 
   async createDocument(documentDTO: DocumentDTO, metadataType: string, attributes: string[]): Promise<void> {
-    const metadata = await this.metadataService.createSchema(metadataType, attributes);
-    documentDTO.file.metadata = metadata;
     const documentEntity = DocumentEntity.fromDTO(documentDTO);
     await this.documentRepository.create(documentEntity);
   }

@@ -1,6 +1,5 @@
 import { MetadataSchema } from "../../domain/entities/MetadataEntity";
 import { MetadataSchemaRepository } from "../../infrastructure/repositories/MetadataRepository";
-import { v4 as uuidv4 } from 'uuid';
 
 export class MetadataService {
   constructor(private metadataSchemaRepository: MetadataSchemaRepository) {}

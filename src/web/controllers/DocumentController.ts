@@ -91,10 +91,36 @@ export class DocumentController {
       if (fileType === 'audio' && req.file?.buffer) {
         const audioMetadata = await parseBuffer(req.file?.buffer, 'audio/mpeg');
         dynamicAttributes = {
-            duration: audioMetadata.format.duration,
-            bitrate: audioMetadata.format.bitrate,
-            channels: audioMetadata.format.numberOfChannels
+          duration: audioMetadata.format.duration,
+          bitrate: audioMetadata.format.bitrate,
+          channels: audioMetadata.format.numberOfChannels
         };
+      }
+
+      // PDF metadata extraction
+      if (fileType === 'application') {
+        // PDF metadata extraction
+        if (req.file?.mimetype === 'application/pdf') {
+            const data = await pdf(req.file.buffer);
+            dynamicAttributes = {
+                pages: data.numpages,
+                version: data.info.PDFFormatVersion
+            };
+        }
+
+        // DOCX, XLSX, and PPTX metadata extraction
+        // else if (['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(req.file?.mimetype)) {
+        //     const data = await parse(req.file.buffer);
+        //     dynamicAttributes = {
+        //         // Modify this based on what specific metadata you want to extract
+        //         // Refer to the library documentation for more detailed information on returned metadata
+        //         title: data.title,
+        //         author: data.creator,
+        //         pages: data.pages,  // For PPTX, this might refer to the number of slides
+        //         words: data.words,  // For DOCX, number of words
+        //         // ... any other attributes you'd like to capture
+        //     };
+        // }
     }
 
       // Video metadata extraction - This is asynchronous with a callback, you might need adjustments
@@ -109,15 +135,6 @@ export class DocumentController {
       //     resolution: `${videoInfo.streams[0].width}x${videoInfo.streams[0].height}`,
       //     fps: videoInfo.streams[0].r_frame_rate,
       //     duration: videoInfo.format.duration
-      //   };
-      // }
-
-      // PDF metadata extraction
-      // if (fileType === 'application' && req.file.mimetype === 'application/pdf') {
-      //   const data = await pdf(req.file.buffer);
-      //   dynamicAttributes = {
-      //     pages: data.numpages,
-      //     version: data.info.PDFFormatVersion
       //   };
       // }
 

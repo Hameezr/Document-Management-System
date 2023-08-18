@@ -5,7 +5,6 @@ import { MetadataSchema } from "../../domain/entities/MetadataEntity";
 
 import sharp from 'sharp';
 import { parseBuffer } from 'music-metadata';
-import ffmpeg from 'fluent-ffmpeg';
 import pdf from 'pdf-parse';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -54,7 +53,6 @@ export class DocumentController {
 
   async createImage(req: Request, res: Response): Promise<void> {
     try {
-
       const documentDTO = await this.processFile(req);
       await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
       res.status(201).json(documentDTO);
@@ -101,44 +99,39 @@ export class DocumentController {
       if (fileType === 'application') {
         // PDF metadata extraction
         if (req.file?.mimetype === 'application/pdf') {
-            const data = await pdf(req.file.buffer);
-            dynamicAttributes = {
-                pages: data.numpages,
-                version: data.info.PDFFormatVersion
-            };
+          const data = await pdf(req.file.buffer);
+          dynamicAttributes = {
+            pages: data.numpages,
+            version: data.info.PDFFormatVersion
+          };
         }
+      }
 
-        // DOCX, XLSX, and PPTX metadata extraction
-        // else if (['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(req.file?.mimetype)) {
-        //     const data = await parse(req.file.buffer);
-        //     dynamicAttributes = {
-        //         // Modify this based on what specific metadata you want to extract
-        //         // Refer to the library documentation for more detailed information on returned metadata
-        //         title: data.title,
-        //         author: data.creator,
-        //         pages: data.pages,  // For PPTX, this might refer to the number of slides
-        //         words: data.words,  // For DOCX, number of words
-        //         // ... any other attributes you'd like to capture
-        //     };
-        // }
-    }
+      // Video metadata extraction
+      //   if (fileType === 'video') {
+      //     const tempFilePath = `./temp-${Date.now()}.mp4`; // Adjust file extension if necessary
 
-      // Video metadata extraction - This is asynchronous with a callback, you might need adjustments
-      // if (fileType === 'video') {
-      //   const videoInfo = await new Promise((resolve, reject) => {
-      //     ffmpeg.ffprobe(req.file.path, (err, info) => {
-      //       if (err) reject(err);
-      //       resolve(info);
+      //     // Write buffer to a temporary file
+      //     // fs.writeFileSync(tempFilePath, req.file.buffer);
+
+      //     const videoInfo = await new Promise((resolve, reject) => {
+      //         ffmpeg.ffprobe(tempFilePath, (err, info) => {
+      //             if (err) reject(err);
+      //             resolve(info);
+      //         });
       //     });
-      //   });
-      //   dynamicAttributes = {
-      //     resolution: `${videoInfo.streams[0].width}x${videoInfo.streams[0].height}`,
-      //     fps: videoInfo.streams[0].r_frame_rate,
-      //     duration: videoInfo.format.duration
-      //   };
+
+      //     dynamicAttributes = {
+      //         resolution: `${videoInfo.streams[0].width}x${videoInfo.streams[0].height}`,
+      //         fps: videoInfo.streams[0].r_frame_rate,
+      //         duration: videoInfo.format.duration
+      //     };
+
+      //     // Remove the temporary file
+      //     fs.unlinkSync(tempFilePath);
       // }
 
-      // Finally, create the MetadataSchema
+      // Finally, creating the MetadataSchema
       metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes);
     }
 

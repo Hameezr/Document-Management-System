@@ -4,6 +4,7 @@ import { DocumentService } from "../../application/Services/DocumentService";
 import { InMemoryDocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
 import { InMemoryMetadataSchemaRepository } from "../../infrastructure/repositories/MetadataRepository";
 import { MetadataService } from "../../application/Services/MetadataService";
+
 import multer from "multer";
 
 const documentRepository = new InMemoryDocumentRepository(); 
@@ -15,7 +16,7 @@ const documentController = new DocumentController(documentService); // Passing t
 
 const documentRouter = Router();
 
-const storage = multer.memoryStorage(); // store the file in memory
+const storage = multer.memoryStorage();
 const upload = multer({ dest: "uploads/", storage: storage });;
 documentRouter.post("/document", upload.single("file"), (req, res) => documentController.createDocument(req, res));
 documentRouter.post("/audio", upload.single("file"), (req, res) => documentController.createAudio(req, res));

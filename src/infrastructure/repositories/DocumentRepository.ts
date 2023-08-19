@@ -1,4 +1,5 @@
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
+import DocumentModel from '../models/DocumentModel';
 
 export interface DocumentRepository {
   create(documentEntity: DocumentEntity): Promise<void>;
@@ -8,37 +9,38 @@ export interface DocumentRepository {
 }
 
 export class InMemoryDocumentRepository implements DocumentRepository {
-  private documents: Map<string, DocumentEntity> = new Map();
-
   async create(documentEntity: DocumentEntity): Promise<void> {
-    this.documents.set(documentEntity.id, documentEntity);
+
+    const mappedDocument = {
+      _id: documentEntity.id,
+      title: documentEntity.title,
+      file: {
+        ...documentEntity.file,
+        metadata: {
+          type: documentEntity.file.metadata.type,
+          attributes: documentEntity.file.metadata.attributes
+        }
+      },
+      author: documentEntity.author,
+      createdAt: documentEntity.createdAt,
+      updatedAt: documentEntity.updatedAt
+    };
+
+    const doc = new DocumentModel(mappedDocument);
+    await doc.save();
   }
 
+
+
   async findById(id: string): Promise<DocumentEntity | null> {
-    const document = this.documents.get(id);
-    return document ?? null;
+    return await DocumentModel.findById(id);
   }
 
   async update(documentEntity: DocumentEntity): Promise<void> {
-    const existingDocument = this.documents.get(documentEntity.id);
-    if (!existingDocument) {
-      throw new Error("Document not found");
-    }
-    existingDocument.updateTitle(documentEntity.title);
-    if (documentEntity.file) {
-      existingDocument.updateFile(documentEntity.file.metadata);
-    }
-
-    this.documents.set(existingDocument.id, existingDocument);
+    await DocumentModel.findByIdAndUpdate(documentEntity.id, documentEntity);
   }
 
   async delete(id: string): Promise<void> {
-    const document = this.documents.get(id);
-    if (!document) {
-      throw new Error("Document not found");
-    }
-
-    this.documents.delete(id);
+    await DocumentModel.findByIdAndDelete(id);
   }
-
 }

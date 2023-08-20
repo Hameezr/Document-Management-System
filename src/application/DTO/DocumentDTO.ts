@@ -13,5 +13,4 @@ export interface DocumentDTO {
   author: string;
   createdAt: Date;
   updatedAt: Date;
-  // Add other properties for document metadata, categories, etc.
 }

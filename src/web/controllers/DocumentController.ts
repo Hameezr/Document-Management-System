@@ -64,7 +64,7 @@ export class DocumentController {
 
   private async processFile(req: Request): Promise<DocumentDTO> {
     const { title, tags, author } = req.body;
-    const { filename, originalname, mimetype } = req.file || {};
+    const {originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
 
@@ -140,7 +140,7 @@ export class DocumentController {
       title,
       file: {
         fileName: originalname || '',
-        fileExtension: filename?.split(".").pop() || "",
+        fileExtension: originalname?.split(".").pop() || "",
         contentType: mimetype || '',
         tags: tagsArray,
         metadata
@@ -170,7 +170,10 @@ export class DocumentController {
   // Add other methods for updating and deleting documents.
   async updateDocument(req: Request, res: Response): Promise<void> {
     try {
-      const documentDTO: DocumentDTO = req.body;
+      const documentDTO: DocumentDTO = {
+        ...req.body,
+        id: req.params.id  // Get the id from the URL params
+      };
       await this.documentService.updateDocument(documentDTO);
       res.sendStatus(200);
     } catch (error) {
@@ -179,7 +182,7 @@ export class DocumentController {
       res.status(500).json({ error: "Failed to update document." });
     }
   }
-
+  
   async deleteDocument(req: Request, res: Response): Promise<void> {
     try {
       const documentId: string = req.params.id;

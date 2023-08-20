@@ -24,6 +24,8 @@ documentRouter.post("/video", upload.single("file"), (req, res) => documentContr
 documentRouter.post("/image", upload.single("file"), (req, res) => documentController.createImage(req, res));
 
 documentRouter.get("/:id", (req, res) => documentController.getDocumentById(req, res));
+documentRouter.delete("/:id", (req, res) => documentController.deleteDocument(req, res));
+documentRouter.put("/:id", upload.single("file"), (req, res) => documentController.updateDocument(req, res));
 
 
 export default documentRouter;

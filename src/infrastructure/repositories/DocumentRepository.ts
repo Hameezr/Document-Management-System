@@ -33,12 +33,26 @@ export class InMemoryDocumentRepository implements DocumentRepository {
 
 
   async findById(id: string): Promise<DocumentEntity | null> {
-    return await DocumentModel.findById(id);
+    const document = await DocumentModel.findById(id);
+    if (document) {
+      return DocumentEntity.fromDTO(document.toObject()); // Convert mongoose document to DTO and then to Entity
+    }
+    return null;
+    // return await DocumentModel.findById(id);
   }
 
   async update(documentEntity: DocumentEntity): Promise<void> {
-    await DocumentModel.findByIdAndUpdate(documentEntity.id, documentEntity);
+    const mappedDocument = {
+      _id: documentEntity.id,
+      title: documentEntity.title,
+      file: documentEntity.file,
+      author: documentEntity.author,
+      updatedAt: new Date()
+    };
+
+    await DocumentModel.findByIdAndUpdate(documentEntity.id, mappedDocument, { new: true });
   }
+
 
   async delete(id: string): Promise<void> {
     await DocumentModel.findByIdAndDelete(id);

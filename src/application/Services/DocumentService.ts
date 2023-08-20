@@ -41,19 +41,13 @@ export class DocumentService {
   async updateDocument(documentDTO: DocumentDTO): Promise<void> {
     const existingDocument = await this.documentRepository.findById(documentDTO.id);
     if (!existingDocument) {
-      throw new Error("Document not found");
-    }
+      throw new Error(`Document with ID ${documentDTO.id} not found`);
+    }    
+    const updatedDocumentEntity = DocumentEntity.fromDTO(documentDTO);  // Use static method to create DocumentEntity from DTO
 
-    // const updatedDocumentEntity = new DocumentEntity(
-    //   documentDTO.id,
-    //   documentDTO.title,
-    //   documentDTO.content,
-    //   documentDTO.author
-    // );
+    await this.documentRepository.update(updatedDocumentEntity);
+}
 
-    // Add other fields from DTO to entity as needed
-    // await this.documentRepository.update(updatedDocumentEntity);
-  }
 
   async deleteDocument(id: string): Promise<void> {
     const existingDocument = await this.documentRepository.findById(id);

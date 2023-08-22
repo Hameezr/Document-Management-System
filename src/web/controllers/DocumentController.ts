@@ -15,9 +15,7 @@ export class DocumentController {
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
-      const metadataType: string = req.body.metadataType;
-      const attributes: string[] = req.body.attributes;
-      await this.documentService.createDocument(documentDTO, metadataType, attributes);
+      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating document:", error);
@@ -40,10 +38,8 @@ export class DocumentController {
   async createVideo(req: Request, res: Response): Promise<void> {
     try {
       const documentDTO = await this.processFile(req);
-      const metadataType: string = req.body.metadataType;
-      const attributes: string[] = req.body.attributes;
       // Additional video-specific processing if needed
-      await this.documentService.createDocument(documentDTO, metadataType, attributes);
+      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
       res.status(201).json(documentDTO);
     } catch (error) {
       console.error("Error creating video document:", error);
@@ -67,11 +63,19 @@ export class DocumentController {
     const {originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
+    let existingDocument 
+    if (req.params.id) {
+      existingDocument = await this.documentService.getDocumentById(req.params.id);
+  }
+    const existingMetadata = existingDocument?.file.metadata;
 
     let metadata: MetadataSchema;
     if (req.body.metadata) {
       const parsedMetadata = JSON.parse(req.body.metadata);
       metadata = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
+    } 
+    else if (!req.file && existingMetadata) {
+      metadata = existingMetadata;
     } else {
       // Placeholder for dynamically determined attributes
       let dynamicAttributes = {};
@@ -107,36 +111,13 @@ export class DocumentController {
         }
       }
 
-      // Video metadata extraction
-      //   if (fileType === 'video') {
-      //     const tempFilePath = `./temp-${Date.now()}.mp4`; // Adjust file extension if necessary
-
-      //     // Write buffer to a temporary file
-      //     // fs.writeFileSync(tempFilePath, req.file.buffer);
-
-      //     const videoInfo = await new Promise((resolve, reject) => {
-      //         ffmpeg.ffprobe(tempFilePath, (err, info) => {
-      //             if (err) reject(err);
-      //             resolve(info);
-      //         });
-      //     });
-
-      //     dynamicAttributes = {
-      //         resolution: `${videoInfo.streams[0].width}x${videoInfo.streams[0].height}`,
-      //         fps: videoInfo.streams[0].r_frame_rate,
-      //         duration: videoInfo.format.duration
-      //     };
-
-      //     // Remove the temporary file
-      //     fs.unlinkSync(tempFilePath);
-      // }
-
       // Finally, creating the MetadataSchema
+
       metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes);
     }
 
     return {
-      id: uuidv4(),
+      id: req.params.id || uuidv4(), // req.params for update method
       title,
       file: {
         fileName: originalname || '',
@@ -167,21 +148,17 @@ export class DocumentController {
     }
   }
 
-  // Add other methods for updating and deleting documents.
   async updateDocument(req: Request, res: Response): Promise<void> {
     try {
-      const documentDTO: DocumentDTO = {
-        ...req.body,
-        id: req.params.id  // Get the id from the URL params
-      };
+      const documentDTO = await this.processFile(req);
       await this.documentService.updateDocument(documentDTO);
       res.sendStatus(200);
     } catch (error) {
-      // Handle error and send appropriate response.
       console.error("Error updating document:", error);
       res.status(500).json({ error: "Failed to update document." });
     }
-  }
+}
+
   
   async deleteDocument(req: Request, res: Response): Promise<void> {
     try {

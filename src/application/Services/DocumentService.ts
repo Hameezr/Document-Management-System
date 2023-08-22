@@ -44,7 +44,6 @@ export class DocumentService {
       throw new Error(`Document with ID ${documentDTO.id} not found`);
     }    
     const updatedDocumentEntity = DocumentEntity.fromDTO(documentDTO);  // Use static method to create DocumentEntity from DTO
-
     await this.documentRepository.update(updatedDocumentEntity);
 }
 

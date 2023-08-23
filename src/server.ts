@@ -14,7 +14,7 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-app.use("/docs", documentRouter);
+app.use("/document", documentRouter);
 app.use("/metadata", metadataRouter);
 
 

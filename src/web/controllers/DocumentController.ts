@@ -23,41 +23,6 @@ export class DocumentController {
     }
   }
 
-  async createAudio(req: Request, res: Response): Promise<void> {
-    try {
-      const documentDTO = await this.processFile(req);
-      // Additional audio-specific processing if needed
-      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
-      res.status(201).json(documentDTO);
-    } catch (error) {
-      console.error("Error creating audio document:", error);
-      res.status(500).json({ error: "Failed to create audio document." });
-    }
-  }
-
-  async createVideo(req: Request, res: Response): Promise<void> {
-    try {
-      const documentDTO = await this.processFile(req);
-      // Additional video-specific processing if needed
-      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
-      res.status(201).json(documentDTO);
-    } catch (error) {
-      console.error("Error creating video document:", error);
-      res.status(500).json({ error: "Failed to create video document." });
-    }
-  }
-
-  async createImage(req: Request, res: Response): Promise<void> {
-    try {
-      const documentDTO = await this.processFile(req);
-      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
-      res.status(201).json(documentDTO);
-    } catch (error) {
-      console.error("Error creating image document:", error);
-      res.status(500).json({ error: "Failed to create image document." });
-    }
-  }
-
   private async processFile(req: Request): Promise<DocumentDTO> {
     const { title, tags, author } = req.body;
     const {originalname, mimetype } = req.file || {};

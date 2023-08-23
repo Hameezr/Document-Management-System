@@ -19,11 +19,7 @@ const documentRouter = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-documentRouter.post("/document", upload.single("file"), (req, res) => documentController.createDocument(req, res));
-documentRouter.post("/audio", upload.single("file"), (req, res) => documentController.createAudio(req, res));
-documentRouter.post("/video", upload.single("file"), (req, res) => documentController.createVideo(req, res));
-documentRouter.post("/image", upload.single("file"), (req, res) => documentController.createImage(req, res));
-
+documentRouter.post("/", upload.single("file"), (req, res) => documentController.createDocument(req, res));
 documentRouter.get("/:id", (req, res) => documentController.getDocumentById(req, res));
 documentRouter.delete("/:id", (req, res) => documentController.deleteDocument(req, res));
 documentRouter.put("/:id", upload.single("file"), (req, res) => documentController.updateDocument(req, res));

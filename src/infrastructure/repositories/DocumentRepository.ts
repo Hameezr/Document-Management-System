@@ -98,7 +98,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
     return [];
   }
 
-  private prismaDocumentToEntity(document: PrismaDocument & { file?: (File & { metadata?: any }); }): DocumentEntity {
+  private prismaDocumentToEntity(document: PrismaDocument & { file?: (File & { metadata?: any } | null); }): DocumentEntity {
     if (!document.file) {
       throw new Error("Document does not have associated file data");
     }

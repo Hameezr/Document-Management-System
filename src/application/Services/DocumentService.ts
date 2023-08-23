@@ -53,7 +53,6 @@ export class DocumentService {
     if (!existingDocument) {
       throw new Error("Document not found");
     }
-
     await this.documentRepository.delete(id);
   }
 }

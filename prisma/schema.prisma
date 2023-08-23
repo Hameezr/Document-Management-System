@@ -10,8 +10,7 @@ datasource db {
 model Document {
   id        String   @id @default(uuid())
   title     String
-  fileId    String   @unique
-  file      File     @relation(fields: [fileId], references: [id])
+  file      File?     
   author    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt     
@@ -24,8 +23,9 @@ model File {
   contentType   String
   tags          Json
   metadataId    String   @unique
-  metadata      Metadata  @relation(fields: [metadataId], references: [id])
-  document      Document?
+  metadata      Metadata  @relation(fields: [metadataId], references: [id], onDelete: Cascade)
+  documentId    String @unique
+  document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 model Metadata {
@@ -34,4 +34,3 @@ model Metadata {
   attributes Json
   file       File?
 }
-

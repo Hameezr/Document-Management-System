@@ -12,11 +12,11 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT;
 
+app.use(bodyParser.json());
 
 app.use("/docs", documentRouter);
 app.use("/metadata", metadataRouter);
 
-app.use(bodyParser.json());
 
 app.use("/", (req, res) => {
   res.send('wront route, sir')

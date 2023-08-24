@@ -6,7 +6,7 @@ import { MetadataService } from "./MetadataService";
 export class DocumentService {
   constructor(private documentRepository: DocumentRepository, private metadataService: MetadataService) { }
 
-  async createDocument(documentEntity: DocumentEntity, metadataType: string, attributes: string[]): Promise<void> {
+  async createDocument(documentEntity: DocumentEntity): Promise<void> {
     await this.documentRepository.create(documentEntity);
 }
 
@@ -18,23 +18,24 @@ export class DocumentService {
       //   const metadata = await this.metadataService.getMetadataById(documentEntity.file.metadata._id);
       //   documentEntity.file.metadata = metadata;
       // }
-      return {
-        // id: documentEntity.id,
-        title: documentEntity.title,
-        file: {
-          fileName: documentEntity.file.fileName,
-          fileExtension: documentEntity.file.fileExtension,
-          contentType: documentEntity.file.contentType,
-          tags: [...documentEntity.file.tags],
-          metadata: documentEntity.file.metadata
-        },
-        author: documentEntity.author,
-        // createdAt: documentEntity.createdAt,
-        // updatedAt: documentEntity.updatedAt,
-      };
+      // return {
+      //   // id: documentEntity.id,
+      //   title: documentEntity.title,
+      //   file: {
+      //     fileName: documentEntity.file.fileName,
+      //     fileExtension: documentEntity.file.fileExtension,
+      //     contentType: documentEntity.file.contentType,
+      //     tags: [...documentEntity.file.tags],
+      //     metadata: documentEntity.file.metadata
+      //   },
+      //   author: documentEntity.author,
+      //   // createdAt: documentEntity.createdAt,
+      //   // updatedAt: documentEntity.updatedAt,
+      // };
     } else {
       return null;
     }
+    return null
   }
 
 

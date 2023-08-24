@@ -1,7 +1,7 @@
 import { BaseEntity, IEntity } from "./BaseEntity";
 import { Result } from "oxide.ts";
 import { MetadataSchema } from "./MetadataEntity";
-import { DocumentDTO } from "../../application/DTO/DocumentDTO";
+import { DocumentDTO, NewDocumentDto } from "../../application/DTO/DocumentDTO";
 
 export interface IDocument extends IEntity {
     title: string;
@@ -26,7 +26,7 @@ export class DocumentEntity extends BaseEntity implements IDocument {
     };
     private _author: string;
 
-    constructor(title: string, file: {
+    private constructor(title: string, file: {
         fileName: string;
         fileExtension: string;
         contentType: string;
@@ -37,6 +37,11 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         this._title = title;
         this._file = file;
         this._author = author;
+    }
+
+    static createFromDTO(newDocumentDto: NewDocumentDto): DocumentEntity {
+        const { title, author, file } = newDocumentDto.data; 
+        return new DocumentEntity(title, file, author);
     }
 
     static create(title: string, file: {
@@ -50,14 +55,12 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         return Result(document);
     }
 
-
     public get title(): string {
         return this._title;
     }
 
     public set title(title: string) {
         this._title = title;
-        this.markUpdated();
     }
 
     public get file(): {
@@ -72,10 +75,6 @@ export class DocumentEntity extends BaseEntity implements IDocument {
 
     public get author(): string {
         return this._author;
-    }
-
-    static fromDTO(documentDTO: DocumentDTO): DocumentEntity {
-        return new DocumentEntity(documentDTO.title, documentDTO.file, documentDTO.author);
     }
 
     serialize(): IDocument {

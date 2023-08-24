@@ -117,7 +117,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
       metadata: metadataSchema
     };
 
-    return new DocumentEntity(document.id, document.title, fileData, document.author);
+    return new DocumentEntity(document.title, fileData, document.author);
   }
 
 }

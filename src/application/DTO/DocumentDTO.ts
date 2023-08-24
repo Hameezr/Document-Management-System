@@ -1,7 +1,7 @@
 import { MetadataSchema } from "../../domain/entities/MetadataEntity";
 
 export interface DocumentDTO {
-  id: string;
+  // id: string;
   title: string;
   file: {
     fileName: string;
@@ -11,6 +11,6 @@ export interface DocumentDTO {
     metadata: MetadataSchema
   };
   author: string;
-  createdAt: Date;
-  updatedAt: Date;
+  // createdAt: Date;
+  // updatedAt: Date;
 }

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { DocumentDTO } from "../../application/DTO/DocumentDTO";
 import { MetadataSchema } from "../../domain/entities/MetadataEntity";
+import { DocumentEntity } from "../../domain/entities/DocumentEntity";
+import { AppError, AppResult} from '@carbonteq/hexapp';
 
 import sharp from 'sharp';
 import { parseBuffer } from 'music-metadata';
@@ -14,14 +16,27 @@ export class DocumentController {
   constructor(private documentService: DocumentService) { }
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
-      const documentDTO = await this.processFile(req);
-      await this.documentService.createDocument(documentDTO, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
-      res.status(201).json(documentDTO);
+        const documentDTO = await this.processFile(req);
+        // Create the DocumentEntity from the DTO
+        const documentEntityResult = DocumentEntity.create(documentDTO.title, documentDTO.file, documentDTO.author);
+
+        if (documentEntityResult.isOk()) {
+            const documentEntity = documentEntityResult.unwrap();
+            console.log(documentEntity)
+            await this.documentService.createDocument(documentEntity, documentDTO.file.metadata.type, documentDTO.file.metadata.attributes);
+            res.status(201).json(documentEntity.serialize());
+        } else {
+            // Handle the error case here
+            const error = documentEntityResult.unwrapErr();
+            console.error("Error creating DocumentEntity:", error);
+            res.status(400).json({ error: "Failed to create DocumentEntity." });
+        }
     } catch (error) {
-      console.error("Error creating document:", error);
-      res.status(500).json({ error: "Failed to create document." });
+        console.error("Error creating document:", error);
+        res.status(500).json({ error: "Failed to create document." });
     }
-  }
+}
+
 
   private async processFile(req: Request): Promise<DocumentDTO> {
     const { title, tags, author } = req.body;
@@ -82,7 +97,7 @@ export class DocumentController {
     }
 
     return {
-      id: req.params.id || uuidv4(), // req.params for update method
+      // id: req.params.id || uuidv4(), // req.params for update method
       title,
       file: {
         fileName: originalname || '',
@@ -92,13 +107,14 @@ export class DocumentController {
         metadata
       },
       author,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      // createdAt: new Date(),
+      // updatedAt: new Date(),
     };
   }
 
   async getDocumentById(req: Request, res: Response): Promise<void> {
     try {
+      console.log(req.params.id)
       const documentId: string = req.params.id;
       const documentDTO = await this.documentService.getDocumentById(documentId);
       if (documentDTO) {
@@ -113,16 +129,16 @@ export class DocumentController {
     }
   }
 
-  async updateDocument(req: Request, res: Response): Promise<void> {
-    try {
-      const documentDTO = await this.processFile(req);
-      await this.documentService.updateDocument(documentDTO);
-      res.sendStatus(200);
-    } catch (error) {
-      console.error("Error updating document:", error);
-      res.status(500).json({ error: "Failed to update document." });
-    }
-}
+//   async updateDocument(req: Request, res: Response): Promise<void> {
+//     try {
+//       const documentDTO = await this.processFile(req);
+//       await this.documentService.updateDocument(documentDTO);
+//       res.sendStatus(200);
+//     } catch (error) {
+//       console.error("Error updating document:", error);
+//       res.status(500).json({ error: "Failed to update document." });
+//     }
+// }
 
   
   async deleteDocument(req: Request, res: Response): Promise<void> {

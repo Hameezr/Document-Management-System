@@ -10,6 +10,10 @@ export class DocumentService {
     await this.documentRepository.create(documentEntity);
   }
 
+  async getAllDocuments(): Promise<DocumentEntity[]> {
+    return await this.documentRepository.findAll();
+  }
+
   async getDocumentById(id: string): Promise<DocumentDTO | null> {
     const documentEntity = await this.documentRepository.findById(id);
     if (documentEntity) {
@@ -17,8 +21,6 @@ export class DocumentService {
     }
     return null;
   }
-
-
 
   async updateDocument(documentDTO: NewDocumentDto, documentId: string): Promise<void> {
     const existingDocument = await this.documentRepository.findById(documentId);

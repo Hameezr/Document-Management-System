@@ -12,6 +12,7 @@ type MyJsonValue = MyJsonPrimitive | MyJsonObject | MyJsonArray;
 export interface DocumentRepository {
   create(documentEntity: DocumentEntity): Promise<void>;
   findById(id: string): Promise<DocumentEntity | null>;
+  findAll(): Promise<DocumentEntity[]>;
   update(documentEntity: DocumentEntity): Promise<void>;
   delete(id: string): Promise<void>;
 }
@@ -41,6 +42,19 @@ export class InMemoryDocumentRepository implements DocumentRepository {
         updatedAt: documentEntity.updatedAt
       }
     });
+  }
+
+  async findAll(): Promise<DocumentEntity[]> {
+    const documents = await prisma.document.findMany({
+      include: {
+        file: {
+          include: {
+            metadata: true
+          }
+        }
+      }
+    });
+    return documents.map(this.prismaDocumentToEntity);
   }
 
   async findById(id: string): Promise<DocumentEntity | null> {
@@ -115,7 +129,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
       tags: tagsArray,
       metadata: metadataSchema
     };
-    
+
     const documentEntity = DocumentEntity.create(document.title, fileData, document.author).unwrap();
     documentEntity.setId(document.id);
     documentEntity.setCreatedAt(document.createdAt);

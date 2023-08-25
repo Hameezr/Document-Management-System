@@ -21,6 +21,7 @@ const upload = multer({ storage: storage });
 
 documentRouter.post("/", upload.single("file"), (req, res) => documentController.createDocument(req, res));
 documentRouter.get("/:id", (req, res) => documentController.getDocumentById(req, res));
+documentRouter.get("/", (req, res) => documentController.getAllDocuments(req, res));
 documentRouter.delete("/:id", (req, res) => documentController.deleteDocument(req, res));
 documentRouter.put("/:id", upload.single("file"), (req, res) => documentController.updateDocument(req, res));
 

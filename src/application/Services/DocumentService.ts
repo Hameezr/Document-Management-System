@@ -14,24 +14,24 @@ export class DocumentService {
   async getDocumentById(id: string): Promise<DocumentDTO | null> {
     const documentEntity = await this.documentRepository.findById(id);
     if (documentEntity) {
-      // if (documentEntity.file && documentEntity.file.metadata) {
-      //   const metadata = await this.metadataService.getMetadataById(documentEntity.file.metadata._id);
-      //   documentEntity.file.metadata = metadata;
-      // }
-      // return {
-      //   // id: documentEntity.id,
-      //   title: documentEntity.title,
-      //   file: {
-      //     fileName: documentEntity.file.fileName,
-      //     fileExtension: documentEntity.file.fileExtension,
-      //     contentType: documentEntity.file.contentType,
-      //     tags: [...documentEntity.file.tags],
-      //     metadata: documentEntity.file.metadata
-      //   },
-      //   author: documentEntity.author,
-      //   // createdAt: documentEntity.createdAt,
-      //   // updatedAt: documentEntity.updatedAt,
-      // };
+      if (documentEntity.file && documentEntity.file.metadata) {
+        const metadata = await this.metadataService.getMetadataById(documentEntity.file.metadata._id);
+        documentEntity.file.metadata = metadata;
+      }
+      return {
+        id: documentEntity.id,
+        title: documentEntity.title,
+        file: {
+          fileName: documentEntity.file.fileName,
+          fileExtension: documentEntity.file.fileExtension,
+          contentType: documentEntity.file.contentType,
+          tags: [...documentEntity.file.tags],
+          metadata: documentEntity.file.metadata
+        },
+        author: documentEntity.author,
+        createdAt: documentEntity.createdAt,
+        updatedAt: documentEntity.updatedAt,
+      };
     } else {
       return null;
     }

@@ -55,11 +55,10 @@ export class InMemoryDocumentRepository implements DocumentRepository {
       }
     });
     if (document) {
-      // return this.prismaDocumentToEntity(document);
+      return this.prismaDocumentToEntity(document);
     }
     return null;
   }
-
 
   async update(documentEntity: DocumentEntity): Promise<void> {
     await prisma.document.update({
@@ -98,26 +97,26 @@ export class InMemoryDocumentRepository implements DocumentRepository {
     return [];
   }
 
-  // private prismaDocumentToEntity(document: PrismaDocument & { file?: (File & { metadata?: any } | null); }): DocumentEntity {
-  //   if (!document.file) {
-  //     throw new Error("Document does not have associated file data");
-  //   }
+  private prismaDocumentToEntity(document: PrismaDocument & { file?: (File & { metadata?: any } | null); }): DocumentEntity {
+    if (!document.file) {
+      throw new Error("Document does not have associated file data");
+    }
 
-  //   // Convert tags using the parseTags utility method
-  //   const tagsArray = this.parseTags(JSON.parse(JSON.stringify(document.file.tags)));
+    // Convert tags using the parseTags utility method
+    const tagsArray = this.parseTags(JSON.parse(JSON.stringify(document.file.tags)));
 
-  //   // Use MetadataSchema's creation method to generate the schema instance
-  //   const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.attributes);
+    // Use MetadataSchema's creation method to generate the schema instance
+    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.attributes);
 
-  //   const fileData = {
-  //     fileName: document.file.fileName,
-  //     fileExtension: document.file.fileExtension,
-  //     contentType: document.file.contentType,
-  //     tags: tagsArray,
-  //     metadata: metadataSchema
-  //   };
+    const fileData = {
+      fileName: document.file.fileName,
+      fileExtension: document.file.fileExtension,
+      contentType: document.file.contentType,
+      tags: tagsArray,
+      metadata: metadataSchema
+    };
 
-  //   return new DocumentEntity(document.title, fileData, document.author);
-  // }
+    return new DocumentEntity(document.title, fileData, document.author);
+  }
 
 }

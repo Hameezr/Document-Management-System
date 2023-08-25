@@ -16,23 +16,21 @@ export class DocumentController {
   constructor(private documentService: DocumentService) { }
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
-        const newDocumentDto = await this.processFile(req);
-        
-        // Convert NewDocumentDto to DocumentEntity
-        const documentEntity = DocumentEntity.createFromDTO(newDocumentDto);
-        
-        // Convert DocumentEntity to DocumentDTO
-        const documentDTO = DocumentDTO.from(documentEntity);
+      const newDocumentDto = await this.processFile(req);
 
-        await this.documentService.createDocument(documentEntity);
-        res.status(201).json(documentEntity.serialize());
+      // Convert NewDocumentDto to DocumentEntity
+      const documentEntity = DocumentEntity.createFromDTO(newDocumentDto);
+
+      // Convert DocumentEntity to DocumentDTO
+      const documentDTO = DocumentDTO.from(documentEntity);
+
+      await this.documentService.createDocument(documentEntity);
+      res.status(201).json(documentEntity.serialize());
     } catch (error) {
-        console.error("Error creating document:", error);
-        res.status(500).json({ error: "Failed to create document." });
+      console.error("Error creating document:", error);
+      res.status(500).json({ error: `Failed to create document, ${error}` });
     }
-}
-
-
+  }
 
   private async processFile(req: Request): Promise<NewDocumentDto> {
     const { title, tags, author } = req.body;
@@ -88,10 +86,12 @@ export class DocumentController {
           };
         }
       }
-
+      const attributesArray = Object.entries(dynamicAttributes).map(
+        ([key, value]) => `${key}: ${value}`
+      );
       // Finally, creating the MetadataSchema
 
-      metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes);
+      metadata = MetadataSchema.createFromAttributes(fileType, attributesArray);
     }
 
     return NewDocumentDto.create({

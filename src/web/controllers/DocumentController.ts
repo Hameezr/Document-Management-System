@@ -110,9 +110,9 @@ export class DocumentController {
   async getDocumentById(req: Request, res: Response): Promise<void> {
     try {
       const documentId: string = req.params.id;
-      const documentDTO = await this.documentService.getDocumentById(documentId);
-      if (documentDTO) {
-        res.json(documentDTO);
+      const documentEntity = await this.documentService.getDocumentById(documentId);
+      if (documentEntity) {
+        res.json(documentEntity.serialize());
       } else {
         res.sendStatus(404);
       }

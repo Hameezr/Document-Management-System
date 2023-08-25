@@ -115,8 +115,12 @@ export class InMemoryDocumentRepository implements DocumentRepository {
       tags: tagsArray,
       metadata: metadataSchema
     };
+    
+    const documentEntity = DocumentEntity.create(document.title, fileData, document.author).unwrap();
+    documentEntity.setId(document.id);
+    documentEntity.setCreatedAt(document.createdAt);
+    documentEntity.setUpdatedAt(document.updatedAt);
 
-    return new DocumentEntity(document.title, fileData, document.author);
+    return documentEntity;
   }
-
 }

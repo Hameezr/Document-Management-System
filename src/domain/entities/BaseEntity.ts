@@ -29,6 +29,10 @@ export abstract class BaseEntity implements IEntity {
         return this._updatedAt;
     }
 
+    protected setId(id: string) {
+        this._id = id;
+    }    
+
     protected markUpdated() {
         this._updatedAt = new Date();
     }

@@ -1,7 +1,7 @@
 import { BaseEntity, IEntity } from "./BaseEntity";
 import { Result } from "oxide.ts";
 import { MetadataSchema } from "./MetadataEntity";
-import { DocumentDTO, NewDocumentDto } from "../../application/DTO/DocumentDTO";
+import { NewDocumentDto } from "../../application/DTO/DocumentDTO";
 
 export interface IDocument extends IEntity {
     title: string;
@@ -75,6 +75,18 @@ export class DocumentEntity extends BaseEntity implements IDocument {
 
     public get author(): string {
         return this._author;
+    }
+
+    setId(id: string) {
+        this._id = id;
+    }
+
+    setCreatedAt(createdAt: Date) {
+        this._createdAt = createdAt;
+    }
+
+    setUpdatedAt(updatedAt: Date) {
+        this._updatedAt = updatedAt;
     }
 
     serialize(): IDocument {

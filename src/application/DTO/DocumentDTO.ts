@@ -4,7 +4,7 @@ import { IEntity } from "../../domain/entities/BaseEntity";
 import { BaseDto, DtoValidationResult } from '@carbonteq/hexapp';
 import { z } from 'zod';
 
-type NewDocumentData = Omit<IDocument, "id" | "createdAt" | "updatedAt" | keyof IEntity>;
+type NewDocumentData = Omit<IDocument, keyof IEntity>;
 
 type SimpleDocumentData = {
   title: string;
@@ -63,7 +63,7 @@ export class NewDocumentDto extends BaseDto {
   }
 }
 
-type PublicDocument = Omit<NewDocumentData, "updatedAt" | "createdAt" | "id">;
+type PublicDocument = NewDocumentData;
 
 export class DocumentDTO extends BaseDto {
   private constructor(private readonly data: NewDocumentData) {
@@ -75,11 +75,6 @@ export class DocumentDTO extends BaseDto {
   }
 
   serialize(): PublicDocument {
-    const { title, file, author } = this.data;
-    return {
-      title,
-      file,
-      author
-    };
+    return this.data;
   }
 }

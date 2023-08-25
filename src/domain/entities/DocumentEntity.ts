@@ -77,6 +77,20 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         return this._author;
     }
 
+    public set file(file: {
+        fileName: string;
+        fileExtension: string;
+        contentType: string;
+        tags: { key: string; name: string }[];
+        metadata: MetadataSchema;
+    }) {
+        this._file = file;
+    }
+
+    public set author(author: string) {
+        this._author = author;
+    }
+
     setId(id: string) {
         this._id = id;
     }

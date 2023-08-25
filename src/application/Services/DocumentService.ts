@@ -1,4 +1,4 @@
-import { DocumentDTO } from "../DTO/DocumentDTO";
+import { DocumentDTO, NewDocumentDto } from "../DTO/DocumentDTO";
 import { DocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { MetadataService } from "./MetadataService";
@@ -20,14 +20,22 @@ export class DocumentService {
 
 
 
-  //   async updateDocument(documentDTO: DocumentDTO): Promise<void> {
-  //     const existingDocument = await this.documentRepository.findById(documentDTO.id);
-  //     if (!existingDocument) {
-  //       throw new Error(`Document with ID ${documentDTO.id} not found`);
-  //     }    
-  //     const updatedDocumentEntity = DocumentEntity.fromDTO(documentDTO);  // Use static method to create DocumentEntity from DTO
-  //     await this.documentRepository.update(updatedDocumentEntity);
-  // }
+  async updateDocument(documentDTO: NewDocumentDto, documentId: string): Promise<void> {
+    const existingDocument = await this.documentRepository.findById(documentId);
+    if (!existingDocument) {
+      throw new Error(`Document with ID ${documentId} not found`);
+    }
+
+    const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDTO);
+
+    existingDocument.title = updatedDocumentEntity.title;
+    existingDocument.file = updatedDocumentEntity.file;
+    existingDocument.author = updatedDocumentEntity.author;
+    existingDocument.setUpdatedAt(new Date());
+
+    await this.documentRepository.update(existingDocument);
+  }
+
 
 
   async deleteDocument(id: string): Promise<void> {

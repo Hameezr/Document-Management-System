@@ -9,20 +9,13 @@ import sharp from 'sharp';
 import { parseBuffer } from 'music-metadata';
 import pdf from 'pdf-parse';
 
-import { v4 as uuidv4 } from 'uuid';
-
 
 export class DocumentController {
   constructor(private documentService: DocumentService) { }
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
       const newDocumentDto = await this.processFile(req);
-
-      // Convert NewDocumentDto to DocumentEntity
       const documentEntity = DocumentEntity.createFromDTO(newDocumentDto);
-
-      // Convert DocumentEntity to DocumentDTO
-      const documentDTO = DocumentDTO.from(documentEntity);
 
       await this.documentService.createDocument(documentEntity);
       res.status(201).json(documentEntity.serialize());
@@ -123,16 +116,16 @@ export class DocumentController {
     }
   }
 
-  //   async updateDocument(req: Request, res: Response): Promise<void> {
-  //     try {
-  //       const documentDTO = await this.processFile(req);
-  //       await this.documentService.updateDocument(documentDTO);
-  //       res.sendStatus(200);
-  //     } catch (error) {
-  //       console.error("Error updating document:", error);
-  //       res.status(500).json({ error: "Failed to update document." });
-  //     }
-  // }
+  async updateDocument(req: Request, res: Response): Promise<void> {
+    try {
+        const documentDTO = await this.processFile(req);
+        await this.documentService.updateDocument(documentDTO, req.params.id);
+        res.sendStatus(200);
+    } catch (error) {
+        console.error("Error updating document:", error);
+        res.status(500).json({ error: "Failed to update document." });
+    }
+}
 
 
   async deleteDocument(req: Request, res: Response): Promise<void> {

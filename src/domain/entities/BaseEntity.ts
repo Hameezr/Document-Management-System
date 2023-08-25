@@ -33,10 +33,6 @@ export abstract class BaseEntity implements IEntity {
         this._id = id;
     }    
 
-    protected markUpdated() {
-        this._updatedAt = new Date();
-    }
-
     protected _copyBaseProps(other: Readonly<IEntity>) {
         this._id = other.id;
         this._createdAt = other.createdAt;

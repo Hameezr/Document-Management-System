@@ -1,23 +1,14 @@
 import { Request, Response } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
-import { DocumentDTO, NewDocumentDto } from "../../application/DTO/DocumentDTO";
-import { MetadataSchema } from "../../domain/entities/MetadataEntity";
-import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { AppError, AppResult } from '@carbonteq/hexapp';
-
-import sharp from 'sharp';
-import { parseBuffer } from 'music-metadata';
-import pdf from 'pdf-parse';
 
 
 export class DocumentController {
   constructor(private documentService: DocumentService) { }
   async createDocument(req: Request, res: Response): Promise<void> {
     try {
-      const newDocumentDto = await this.processFile(req);
-      const documentEntity = DocumentEntity.createFromDTO(newDocumentDto);
-
-      await this.documentService.createDocument(documentEntity);
+      const newDocumentDto = await this.documentService.processFile(req);
+      const documentEntity = await this.documentService.createDocument(newDocumentDto);
       res.status(201).json(documentEntity.serialize());
     } catch (error) {
       console.error("Error creating document:", error);
@@ -25,85 +16,9 @@ export class DocumentController {
     }
   }
 
-  private async processFile(req: Request): Promise<NewDocumentDto> {
-    const { title, tags, author } = req.body;
-    const { originalname, mimetype } = req.file || {};
-    const tagsArray = JSON.parse(tags);
-    const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
-    let existingDocument
-    if (req.params.id) {
-      existingDocument = await this.documentService.getDocumentById(req.params.id);
-    }
-    const existingDocumentData = existingDocument?.serialize();
-    const existingMetadata = existingDocumentData?.file.metadata;
-
-
-    let metadata: MetadataSchema;
-    if (req.body.metadata) {
-      const parsedMetadata = JSON.parse(req.body.metadata);
-      metadata = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
-    }
-    else if (!req.file && existingMetadata) {
-      metadata = existingMetadata;
-    } else {
-      // Placeholder for dynamically determined attributes
-      let dynamicAttributes = {};
-
-      // Image metadata extraction
-      if (fileType === 'image') {
-        const imageMetadata = await sharp(req.file?.buffer).metadata();
-        dynamicAttributes = {
-          resolution: `${imageMetadata.width}x${imageMetadata.height}`,
-          colorDepth: `${imageMetadata.channels} channels`,
-          format: imageMetadata.format
-        };
-      }
-      // Audio metadata extraction
-      if (fileType === 'audio' && req.file?.buffer) {
-        const audioMetadata = await parseBuffer(req.file?.buffer, 'audio/mpeg');
-        dynamicAttributes = {
-          duration: audioMetadata.format.duration,
-          bitrate: audioMetadata.format.bitrate,
-          channels: audioMetadata.format.numberOfChannels
-        };
-      }
-
-      // PDF metadata extraction
-      if (fileType === 'application') {
-        // PDF metadata extraction
-        if (req.file?.mimetype === 'application/pdf') {
-          const data = await pdf(req.file.buffer);
-          dynamicAttributes = {
-            pages: data.numpages,
-            version: data.info.PDFFormatVersion
-          };
-        }
-      }
-      const attributesArray = Object.entries(dynamicAttributes).map(
-        ([key, value]) => `${key}: ${value}`
-      );
-      // Finally, creating the MetadataSchema
-
-      metadata = MetadataSchema.createFromAttributes(fileType, attributesArray);
-    }
-
-    return NewDocumentDto.create({
-      title,
-      file: {
-        fileName: originalname || '',
-        fileExtension: originalname?.split(".").pop() || "",
-        contentType: mimetype || '',
-        tags: tagsArray,
-        metadata
-      },
-      author
-    }).unwrap();
-  }
-
   async getAllDocuments(req: Request, res: Response): Promise<void> {
     try {
       const documents = await this.documentService.getAllDocuments();
-      console.log(documents)
       res.status(200).json(documents);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -129,7 +44,7 @@ export class DocumentController {
 
   async updateDocument(req: Request, res: Response): Promise<void> {
     try {
-      const documentDTO = await this.processFile(req);
+      const documentDTO = await this.documentService.processFile(req);
       await this.documentService.updateDocument(documentDTO, req.params.id);
       res.sendStatus(200);
     } catch (error) {

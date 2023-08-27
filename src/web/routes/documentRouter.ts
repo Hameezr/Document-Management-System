@@ -2,16 +2,11 @@ import { Router } from "express";
 import { DocumentController } from "../controllers/DocumentController";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { InMemoryDocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
-import { InMemoryMetadataSchemaRepository } from "../../infrastructure/repositories/MetadataRepository";
-import { MetadataService } from "../../application/Services/MetadataService";
 
 import multer from "multer";
 
-const documentRepository = new InMemoryDocumentRepository(); 
-const metadataRepository = new InMemoryMetadataSchemaRepository();
-const metadataService = new MetadataService(metadataRepository);
-
-const documentService = new DocumentService(documentRepository, metadataService); 
+const documentRepository = new InMemoryDocumentRepository();
+const documentService = new DocumentService(documentRepository); 
 const documentController = new DocumentController(documentService); // Passing the instance to DocumentController
 
 const documentRouter = Router();

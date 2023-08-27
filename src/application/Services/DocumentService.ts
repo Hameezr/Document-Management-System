@@ -12,10 +12,11 @@ import pdf from 'pdf-parse';
 export class DocumentService {
   constructor(private documentRepository: DocumentRepository) { }
 
-  async createDocument(newDocumentDto: NewDocumentDto): Promise<DocumentEntity> {
+  async createDocument(req: Request): Promise<DocumentDTO> {
+    const newDocumentDto = await this.processFile(req);
     const documentEntity = DocumentEntity.createFromDTO(newDocumentDto);
     await this.documentRepository.create(documentEntity);
-    return documentEntity;
+    return DocumentDTO.from(documentEntity);
   }
 
   async getAllDocuments(): Promise<DocumentEntity[]> {
@@ -30,7 +31,8 @@ export class DocumentService {
     return null;
   }
 
-  async updateDocument(documentDTO: NewDocumentDto, documentId: string): Promise<void> {
+  async updateDocument(req: Request, documentId: string): Promise<DocumentDTO> {
+    const documentDTO = await this.processFile(req);
     const existingDocument = await this.documentRepository.findById(documentId);
     if (!existingDocument) {
       throw new Error(`Document with ID ${documentId} not found`);
@@ -44,6 +46,7 @@ export class DocumentService {
     existingDocument.setUpdatedAt(new Date());
 
     await this.documentRepository.update(existingDocument);
+    return DocumentDTO.from(existingDocument);
   }
 
   async deleteDocument(id: string): Promise<void> {
@@ -54,7 +57,7 @@ export class DocumentService {
     await this.documentRepository.delete(id);
   }
 
-  async processFile(req: Request): Promise<NewDocumentDto> {
+  private async processFile(req: Request): Promise<NewDocumentDto> {
     const { title, tags, author } = req.body;
     const { originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);

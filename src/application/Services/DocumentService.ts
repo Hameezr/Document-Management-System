@@ -3,6 +3,7 @@ import { DocumentRepository } from "../../infrastructure/repositories/DocumentRe
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { MetadataSchema } from "../../domain/entities/MetadataEntity";
 import { Request } from "express";
+import { AppError, AppResult } from '@carbonteq/hexapp';
 
 import sharp from 'sharp';
 import { parseBuffer } from 'music-metadata';
@@ -12,61 +13,72 @@ import pdf from 'pdf-parse';
 export class DocumentService {
   constructor(private documentRepository: DocumentRepository) { }
 
-  async createDocument(req: Request): Promise<DocumentDTO> {
-    const newDocumentDto = await this.processFile(req);
-    const documentEntity = DocumentEntity.createFromDTO(newDocumentDto);
-    await this.documentRepository.create(documentEntity);
-    return DocumentDTO.from(documentEntity);
+  async createDocument(req: Request): Promise<AppResult<DocumentDTO>> {
+    const newDocumentDtoResult = await this.processFile(req);
+    if (newDocumentDtoResult.isOk()) {
+      const documentEntity = DocumentEntity.createFromDTO(newDocumentDtoResult.unwrap());
+      await this.documentRepository.create(documentEntity);
+      return AppResult.Ok(DocumentDTO.from(documentEntity));
+    } else {
+      return AppResult.Err(AppError.NotFound("Document not found"));
+    }
   }
 
-  async getAllDocuments(): Promise<DocumentEntity[]> {
-    return await this.documentRepository.findAll();
+  async getAllDocuments(): Promise<AppResult<DocumentEntity[]>> {
+    const documents = await this.documentRepository.findAll();
+    return AppResult.Ok(documents);
   }
 
-  async getDocumentById(id: string): Promise<DocumentDTO | null> {
+  async getDocumentById(id: string): Promise<AppResult<DocumentDTO>> {
     const documentEntity = await this.documentRepository.findById(id);
     if (documentEntity) {
-      return DocumentDTO.from(documentEntity);
+      return AppResult.Ok(DocumentDTO.from(documentEntity));
     }
-    return null;
+    return AppResult.Err(AppError.NotFound("Document not found"));
   }
 
-  async updateDocument(req: Request, documentId: string): Promise<DocumentDTO> {
-    const documentDTO = await this.processFile(req);
-    const existingDocument = await this.documentRepository.findById(documentId);
-    if (!existingDocument) {
-      throw new Error(`Document with ID ${documentId} not found`);
+  async updateDocument(req: Request, documentId: string): Promise<AppResult<DocumentDTO>> {
+    const documentDtoResult = await this.processFile(req);
+    if (documentDtoResult.isOk()) {
+      const existingDocument = await this.documentRepository.findById(documentId);
+      if (!existingDocument) {
+        return AppResult.Err(AppError.NotFound(`Document with ID ${documentId} not found`));
+      }
+
+      const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDtoResult.unwrap());
+      existingDocument.title = updatedDocumentEntity.title;
+      existingDocument.file = updatedDocumentEntity.file;
+      existingDocument.author = updatedDocumentEntity.author;
+      existingDocument.setUpdatedAt(new Date());
+
+      await this.documentRepository.update(existingDocument);
+      return AppResult.Ok(DocumentDTO.from(existingDocument));
     }
-
-    const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDTO);
-
-    existingDocument.title = updatedDocumentEntity.title;
-    existingDocument.file = updatedDocumentEntity.file;
-    existingDocument.author = updatedDocumentEntity.author;
-    existingDocument.setUpdatedAt(new Date());
-
-    await this.documentRepository.update(existingDocument);
-    return DocumentDTO.from(existingDocument);
+    return AppResult.Err(AppError.NotFound("Document not found"));
   }
 
-  async deleteDocument(id: string): Promise<void> {
+  async deleteDocument(id: string): Promise<AppResult<void>> {
     const existingDocument = await this.documentRepository.findById(id);
     if (!existingDocument) {
-      throw new Error("Document not found");
+      return AppResult.Err(AppError.NotFound("Document not found"));
     }
     await this.documentRepository.delete(id);
+    return AppResult.Ok(undefined); // App result requires an argument even if it is void, hence passing undefined
   }
 
-  private async processFile(req: Request): Promise<NewDocumentDto> {
+  private async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
     const { title, tags, author } = req.body;
     const { originalname, mimetype } = req.file || {};
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
-    let existingDocument
+
+    let existingDocumentData;
     if (req.params.id) {
-      existingDocument = await this.getDocumentById(req.params.id);
+      const existingDocumentResult = await this.getDocumentById(req.params.id);
+      if (existingDocumentResult.isOk()) {
+        existingDocumentData = existingDocumentResult.unwrap().serialize();
+      }
     }
-    const existingDocumentData = existingDocument?.serialize();
     const existingMetadata = existingDocumentData?.file.metadata;
 
 
@@ -119,7 +131,7 @@ export class DocumentService {
       metadata = MetadataSchema.createFromAttributes(fileType, attributesArray);
     }
 
-    return NewDocumentDto.create({
+    return AppResult.Ok(NewDocumentDto.create({
       title,
       file: {
         fileName: originalname || '',
@@ -129,6 +141,6 @@ export class DocumentService {
         metadata
       },
       author
-    }).unwrap();
+    }).unwrap());
   }
 }

@@ -7,12 +7,13 @@ export class DocumentController {
   constructor(private documentService: DocumentService) { }
 
   async createDocument(req: Request, res: Response): Promise<void> {
-    try {
-      const documentDTO = await this.documentService.createDocument(req);
-      res.status(201).json(documentDTO.serialize());
-    } catch (error) {
-      console.error("Error creating document:", error);
-      res.status(500).json({ error: `Failed to create document, ${error}` });
+    const documentDTOResult = await this.documentService.createDocument(req);
+    if (documentDTOResult.isOk()) {
+      res.status(201).json(documentDTOResult.unwrap().serialize());
+    } else {
+      const error = documentDTOResult as AppResult<AppError>;
+      console.error("Error creating document:", error.unwrapErr().message);
+      res.status(500).json({ error: `Failed to create document, ${error.unwrapErr().message}` });
     }
   }
 
@@ -27,27 +28,23 @@ export class DocumentController {
   }
 
   async getDocumentById(req: Request, res: Response): Promise<void> {
-    try {
-      const documentId: string = req.params.id;
-      const documentEntity = await this.documentService.getDocumentById(documentId);
-      if (documentEntity) {
-        res.json(documentEntity.serialize());
-      } else {
-        res.sendStatus(404);
-      }
-    } catch (error) {
-      // Handle error and send appropriate response.
-      console.error("Error retrieving document:", error);
-      res.status(500).json({ error: "Failed to retrieve document." });
+    const documentEntityResult = await this.documentService.getDocumentById(req.params.id);
+    if (documentEntityResult.isOk()) {
+      res.json(documentEntityResult.unwrap().serialize());
+    } else {
+      const error = documentEntityResult as AppResult<AppError>;
+      console.error("Error retrieving document:", error.unwrapErr().message);
+      res.status(404).json({ error: "Document not found." });
     }
   }
 
   async updateDocument(req: Request, res: Response): Promise<void> {
-    try {
-      const updatedDocumentDTO = await this.documentService.updateDocument(req, req.params.id);
-      res.status(200).json(updatedDocumentDTO.serialize());
-    } catch (error) {
-      console.error("Error updating document:", error);
+    const updatedDocumentDTOResult = await this.documentService.updateDocument(req, req.params.id);
+    if (updatedDocumentDTOResult.isOk()) {
+      res.status(200).json(updatedDocumentDTOResult.unwrap().serialize());
+    } else {
+      const error = updatedDocumentDTOResult as AppResult<AppError>;
+      console.error("Error updating document:", error.unwrapErr().message);
       res.status(500).json({ error: "Failed to update document." });
     }
   }

@@ -39,22 +39,23 @@ export class DocumentService {
 
   async updateDocument(req: Request, documentId: string): Promise<AppResult<DocumentDTO>> {
     const documentDtoResult = await this.processFile(req);
-    if (documentDtoResult.isOk()) {
-      const existingDocument = await this.documentRepository.findById(documentId);
-      if (!existingDocument) {
-        return AppResult.Err(AppError.NotFound(`Document with ID ${documentId} not found`));
-      }
-
-      const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDtoResult.unwrap());
-      existingDocument.title = updatedDocumentEntity.title;
-      existingDocument.file = updatedDocumentEntity.file;
-      existingDocument.author = updatedDocumentEntity.author;
-      existingDocument.setUpdatedAt(new Date());
-
-      await this.documentRepository.update(existingDocument);
-      return AppResult.Ok(DocumentDTO.from(existingDocument));
+    if (documentDtoResult.isErr()) {
+      return documentDtoResult;
     }
-    return AppResult.Err(AppError.NotFound("Document not found"));
+
+    const existingDocument = await this.documentRepository.findById(documentId);
+    if (!existingDocument) {
+      return AppResult.Err(AppError.NotFound(`Document with ID ${documentId} not found`));
+    }
+
+    const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDtoResult.unwrap());
+    existingDocument.title = updatedDocumentEntity.title;
+    existingDocument.file = updatedDocumentEntity.file;
+    existingDocument.author = updatedDocumentEntity.author;
+    existingDocument.setUpdatedAt(new Date());
+
+    await this.documentRepository.update(existingDocument);
+    return AppResult.Ok(DocumentDTO.from(existingDocument));
   }
 
   async deleteDocument(id: string): Promise<AppResult<void>> {

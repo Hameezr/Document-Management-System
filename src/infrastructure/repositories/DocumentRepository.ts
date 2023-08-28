@@ -54,7 +54,7 @@ export class InMemoryDocumentRepository implements DocumentRepository {
         }
       }
     });
-    return documents.map(this.prismaDocumentToEntity);
+    return documents.map(doc => this.prismaDocumentToEntity(doc));
   }
 
   async findById(id: string): Promise<DocumentEntity | null> {

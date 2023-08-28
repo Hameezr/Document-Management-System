@@ -1,19 +1,18 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { AppError, AppResult } from '@carbonteq/hexapp';
+import { handleResult } from "../utils/results";
 
 
 export class DocumentController {
   constructor(private documentService: DocumentService) { }
 
-  async createDocument(req: Request, res: Response): Promise<void> {
+  createDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentDTOResult = await this.documentService.createDocument(req);
     if (documentDTOResult.isOk()) {
-      res.status(201).json(documentDTOResult.unwrap().serialize());
+      handleResult(res, documentDTOResult, 201);
     } else {
-      const error = documentDTOResult as AppResult<AppError>;
-      console.error("Error creating document:", error.unwrapErr().message);
-      res.status(500).json({ error: `Failed to create document, ${error.unwrapErr().message}` });
+      next(documentDTOResult);
     }
   }
 

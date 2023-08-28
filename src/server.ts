@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import bodyParser from "body-parser";
 import documentRouter from "./web/routes/documentRouter";
 import metadataRouter from "./web/routes/metadataRouter";
+import { errorsInterceptorMiddleware } from './web/utils/errors.interceptor';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -21,6 +22,8 @@ app.use("/metadata", metadataRouter);
 app.use("/", (req, res) => {
   res.send('wront route, sir')
 });
+
+app.use(errorsInterceptorMiddleware());
 
 async function ensureDatabaseConnection() {
   try {

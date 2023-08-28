@@ -20,7 +20,7 @@ export class DocumentService {
       await this.documentRepository.create(documentEntity);
       return AppResult.Ok(DocumentDTO.from(documentEntity));
     } else {
-      return AppResult.Err(AppError.NotFound("Document not found"));
+      return newDocumentDtoResult;
     }
   }
 
@@ -131,7 +131,7 @@ export class DocumentService {
       metadata = MetadataSchema.createFromAttributes(fileType, attributesArray);
     }
 
-    return AppResult.Ok(NewDocumentDto.create({
+    const newDocumentDtoValidationResult = NewDocumentDto.create({
       title,
       file: {
         fileName: originalname || '',
@@ -141,6 +141,14 @@ export class DocumentService {
         metadata
       },
       author
-    }).unwrap());
+    });
+
+    if (newDocumentDtoValidationResult.isErr()) {
+      const validationError = newDocumentDtoValidationResult.unwrapErr();
+      return AppResult.Err(AppError.InvalidData(`Validation Error: ${validationError.message}`));
+      // return AppResult.Err(AppError.InvalidData(validationError.message));
+    }
+
+    return AppResult.Ok(newDocumentDtoValidationResult.unwrap());
   }
 }

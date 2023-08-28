@@ -147,7 +147,6 @@ export class DocumentService {
     if (newDocumentDtoValidationResult.isErr()) {
       const validationError = newDocumentDtoValidationResult.unwrapErr();
       return AppResult.Err(AppError.InvalidData(`Validation Error: ${validationError.message}`));
-      // return AppResult.Err(AppError.InvalidData(validationError.message));
     }
 
     return AppResult.Ok(newDocumentDtoValidationResult.unwrap());

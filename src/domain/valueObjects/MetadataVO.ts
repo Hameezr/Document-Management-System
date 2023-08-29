@@ -29,11 +29,17 @@ export class MetadataSchema {
 
     validateAttributes() {
         const requiredAttributes = getRequiredAttributesForType(this._type);
-        const attributeKeys = this._attributes.map(attr => attr.split(':')[0]);
+        const attributeKeys = this._attributes.map(attr => attr.split(':')[0]); // Extract keys from 'key:value' strings
+        const missingAttributes = [];
+
         for (const required of requiredAttributes) {
             if (!attributeKeys.includes(required)) {
-                throw new Error(`Missing required attribute: ${required} for type ${this._type}`);
+                missingAttributes.push(required);
             }
+        }
+
+        if (missingAttributes.length > 0) {
+            throw new Error(`Missing required attributes for type ${this._type}: ${missingAttributes.join(', ')}`);
         }
     }
 
@@ -95,4 +101,5 @@ function getRequiredAttributesForType(type: string): string[] {
             return ['resolution', 'fps', 'duration'];
         default:
             return [];
-    }}
+    }
+}

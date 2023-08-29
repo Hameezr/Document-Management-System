@@ -70,11 +70,19 @@ export class DocumentService {
   private async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
     const { title, tags, author } = req.body;
     const { originalname, mimetype } = req.file || {};
-    const tagsArray = JSON.parse(tags);
+    // const tagsArray = JSON.parse(tags);
+    let tagsArray: any = [];
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
 
     if (!req.file) {
       return AppResult.Err(AppError.InvalidData("No file provided"));
+    }
+    try {
+      if (tags) {
+        tagsArray = JSON.parse(tags);
+      }
+    } catch (e) {
+      return AppResult.Err(AppError.InvalidData("Invalid tags format"));
     }
 
     let existingDocumentData;

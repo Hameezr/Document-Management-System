@@ -12,7 +12,7 @@ type SimpleDocumentData = {
     fileName: string;
     fileExtension: string;
     contentType: string;
-    tags: { key: string; name: string }[];
+    tags?: { key: string; name: string }[];
     metadata: {
       type: "audio" | "video" | "application" | "image";
       attributes: string[];
@@ -31,7 +31,7 @@ export class NewDocumentDto extends BaseDto {
       tags: z.array(z.object({
         key: z.string().nonempty(),
         name: z.string().nonempty(),
-      })),
+      })).optional(),
       metadata: z.object({
         type: z.union([
           z.literal("audio"),
@@ -54,10 +54,11 @@ export class NewDocumentDto extends BaseDto {
         title: simpleData.title,
         file: {
           ...simpleData.file,
+          tags: simpleData.file.tags || [],
           metadata: new MetadataSchema(simpleData.file.metadata.type, simpleData.file.metadata.attributes)
         },
         author: simpleData.author
-      };
+      };      
       return new NewDocumentDto(transformedData);
     });
   }

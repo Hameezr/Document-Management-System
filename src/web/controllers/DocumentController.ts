@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { handleResult } from "../utils/results";
-import { injectable, inject} from "inversify";
+import { injectable, inject } from "inversify";
 import TYPES from "../../infrastructure/DIContainer/types";
 
 @injectable()
@@ -47,7 +47,7 @@ export class DocumentController {
   deleteDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const deleteDocumentResult = await this.documentService.deleteDocument(req.params.id);
     if (deleteDocumentResult.isOk()) {
-      handleResult(res, deleteDocumentResult, 200);
+      handleResult(res, deleteDocumentResult, 200, "Document deleted successfully");
     } else {
       next(deleteDocumentResult);
     }

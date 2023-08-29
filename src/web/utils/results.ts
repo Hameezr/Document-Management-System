@@ -18,4 +18,3 @@ export async function handleResult<T>(
     throw (result as AppResult<T>).unwrapErr();
   }
 }
-

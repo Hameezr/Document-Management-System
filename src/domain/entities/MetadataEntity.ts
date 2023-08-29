@@ -34,7 +34,6 @@ export class MetadataSchema {
         }
 
         // Default attributes based on type
-        // You can modify this based on your needs.
         let defaultAttributes: any = {};
         switch (type) {
             case "audio":

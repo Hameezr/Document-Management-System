@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
-import { AppError, AppResult } from '@carbonteq/hexapp';
 import { handleResult } from "../utils/results";
 
 

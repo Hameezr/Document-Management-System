@@ -73,6 +73,10 @@ export class DocumentService {
     const tagsArray = JSON.parse(tags);
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
 
+    if (!req.file) {
+      return AppResult.Err(AppError.InvalidData("No file provided"));
+    }
+
     let existingDocumentData;
     if (req.params.id) {
       const existingDocumentResult = await this.getDocumentById(req.params.id);
@@ -147,7 +151,7 @@ export class DocumentService {
     if (newDocumentDtoValidationResult.isErr()) {
       const validationError = newDocumentDtoValidationResult.unwrapErr();
       return AppResult.Err(AppError.InvalidData(validationError.message));
-  }  
+    }
     return AppResult.Ok(newDocumentDtoValidationResult.unwrap());
   }
 }

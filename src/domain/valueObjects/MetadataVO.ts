@@ -27,6 +27,17 @@ export class MetadataSchema {
         return true;
     }
 
+    validateAttributes() {
+        const requiredAttributes = getRequiredAttributesForType(this._type);
+        const attributeKeys = this._attributes.map(attr => attr.split(':')[0]); // Extract keys from 'key:value' strings
+        for (const required of requiredAttributes) {
+            if (!attributeKeys.includes(required)) {
+                throw new Error(`Missing required attribute ${required} for type ${this._type}`);
+            }
+        }
+    }
+
+
     static createFromAttributes(type: string, attributes?: any): MetadataSchema {
         // Validate the type or throw an error
         if (!["audio", "video", "application", "image"].includes(type)) {
@@ -69,5 +80,18 @@ export class MetadataSchema {
         // If attributes are provided, use them; if not, use defaultAttributes
         const finalAttributes = attributes || defaultAttributes;
         return new MetadataSchema(type as any, finalAttributes);
+    }
+}
+
+// Helper function to get required attributes based on file type
+function getRequiredAttributesForType(type: string): string[] {
+    switch (type) {
+        case 'audio':
+            return ['duration', 'bitrate', 'channels'];
+        case 'image':
+            return ['resolution', 'colorDepth', 'format'];
+        // Add other types as needed
+        default:
+            return [];
     }
 }

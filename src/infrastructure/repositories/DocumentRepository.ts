@@ -1,6 +1,6 @@
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { PrismaClient, Document as PrismaDocument, Metadata, File } from '@prisma/client';
-import { MetadataSchema } from "../../domain/entities/MetadataEntity";
+import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { injectable } from "inversify";
 
 const prisma = new PrismaClient();

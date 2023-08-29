@@ -1,6 +1,6 @@
 import { BaseEntity, IEntity } from "./BaseEntity";
 import { Result } from "oxide.ts";
-import { MetadataSchema } from "./MetadataEntity";
+import { MetadataSchema } from "../valueObjects/MetadataVO";
 import { NewDocumentDto } from "../../application/DTO/DocumentDTO";
 
 export interface IDocument extends IEntity {

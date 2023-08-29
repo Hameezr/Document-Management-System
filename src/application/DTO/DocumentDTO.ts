@@ -1,5 +1,5 @@
 import { IDocument, DocumentEntity } from "../../domain/entities/DocumentEntity";
-import { MetadataSchema } from "../../domain/entities/MetadataEntity";
+import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { IEntity } from "../../domain/entities/BaseEntity";
 import { BaseDto, DtoValidationResult } from '@carbonteq/hexapp';
 import { z } from 'zod';

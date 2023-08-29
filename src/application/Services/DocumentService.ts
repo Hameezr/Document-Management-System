@@ -1,7 +1,7 @@
 import { DocumentDTO, NewDocumentDto } from "../DTO/DocumentDTO";
 import { DocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
-import { MetadataSchema } from "../../domain/entities/MetadataEntity";
+import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { Request } from "express";
 import { AppError, AppResult } from '@carbonteq/hexapp';
 import { injectable, inject } from "inversify";
@@ -13,7 +13,7 @@ import pdf from 'pdf-parse';
 
 @injectable()
 export class DocumentService {
-  constructor(@inject(TYPES.DocumentRepository) private documentRepository: DocumentRepository) {}
+  constructor(@inject(TYPES.DocumentRepository) private documentRepository: DocumentRepository) { }
 
   async createDocument(req: Request): Promise<AppResult<DocumentDTO>> {
     const newDocumentDtoResult = await this.processFile(req);
@@ -36,7 +36,7 @@ export class DocumentService {
     if (documentEntity) {
       return AppResult.Ok(DocumentDTO.from(documentEntity));
     }
-    return AppResult.Err(AppError.NotFound("Document not found"));
+    return AppResult.Err(AppError.NotFound(`Document with ID ${id} not found`));
   }
 
   async updateDocument(req: Request, documentId: string): Promise<AppResult<DocumentDTO>> {
@@ -51,6 +51,14 @@ export class DocumentService {
     }
 
     const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDtoResult.unwrap());
+
+    if (req.file) {
+      const newFileType = req.file.mimetype?.split("/")[0] || '';
+      if (newFileType !== updatedDocumentEntity.file.metadata.type) {
+        return AppResult.Err(AppError.InvalidData('Metadata type does not match the new file type'));
+      }
+    }
+
     existingDocument.title = updatedDocumentEntity.title;
     existingDocument.file = updatedDocumentEntity.file;
     existingDocument.author = updatedDocumentEntity.author;
@@ -96,11 +104,15 @@ export class DocumentService {
     }
     const existingMetadata = existingDocumentData?.file.metadata;
 
-
     let metadata: MetadataSchema;
     if (req.body.metadata) {
       const parsedMetadata = JSON.parse(req.body.metadata);
       metadata = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
+      try {
+        metadata.validateAttributes();
+      } catch (err) {
+        return AppResult.Err(AppError.InvalidData('Invalid metadata provided'));
+      }
     }
     else if (!req.file && existingMetadata) {
       metadata = existingMetadata;

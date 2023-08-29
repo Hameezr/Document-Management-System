@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { handleResult } from "../utils/results";
+import { injectable, inject} from "inversify";
+import TYPES from "../../infrastructure/DIContainer/types";
 
-
+@injectable()
 export class DocumentController {
-  constructor(private documentService: DocumentService) { }
+  constructor(@inject(TYPES.DocumentService) private documentService: DocumentService) { }
 
   createDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentDTOResult = await this.documentService.createDocument(req);

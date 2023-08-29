@@ -4,14 +4,16 @@ import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { MetadataSchema } from "../../domain/entities/MetadataEntity";
 import { Request } from "express";
 import { AppError, AppResult } from '@carbonteq/hexapp';
+import { injectable, inject } from "inversify";
+import TYPES from "../../infrastructure/DIContainer/types";
 
 import sharp from 'sharp';
 import { parseBuffer } from 'music-metadata';
 import pdf from 'pdf-parse';
 
-
+@injectable()
 export class DocumentService {
-  constructor(private documentRepository: DocumentRepository) { }
+  constructor(@inject(TYPES.DocumentRepository) private documentRepository: DocumentRepository) {}
 
   async createDocument(req: Request): Promise<AppResult<DocumentDTO>> {
     const newDocumentDtoResult = await this.processFile(req);

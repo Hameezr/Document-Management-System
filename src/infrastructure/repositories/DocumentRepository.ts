@@ -1,6 +1,7 @@
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { PrismaClient, Document as PrismaDocument, Metadata, File } from '@prisma/client';
 import { MetadataSchema } from "../../domain/entities/MetadataEntity";
+import { injectable } from "inversify";
 
 const prisma = new PrismaClient();
 
@@ -16,8 +17,8 @@ export interface DocumentRepository {
   update(documentEntity: DocumentEntity): Promise<void>;
   delete(id: string): Promise<void>;
 }
-
-export class InMemoryDocumentRepository implements DocumentRepository {
+@injectable()
+export class DocRepository implements DocumentRepository {
   async create(documentEntity: DocumentEntity): Promise<void> {
     await prisma.document.create({
       data: {

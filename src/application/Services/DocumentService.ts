@@ -52,13 +52,6 @@ export class DocumentService {
 
     const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDtoResult.unwrap());
 
-    if (req.file) {
-      const newFileType = req.file.mimetype?.split("/")[0] || '';
-      if (newFileType !== updatedDocumentEntity.file.metadata.type) {
-        return AppResult.Err(AppError.InvalidData('Metadata type does not match the new file type'));
-      }
-    }
-
     existingDocument.title = updatedDocumentEntity.title;
     existingDocument.file = updatedDocumentEntity.file;
     existingDocument.author = updatedDocumentEntity.author;
@@ -80,7 +73,6 @@ export class DocumentService {
   private async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
     const { title, tags, author } = req.body;
     const { originalname, mimetype } = req.file || {};
-    // const tagsArray = JSON.parse(tags);
     let tagsArray: any = [];
     const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
 
@@ -111,15 +103,23 @@ export class DocumentService {
       try {
         metadata.validateAttributes();
       } catch (err) {
-        return AppResult.Err(AppError.InvalidData('Invalid metadata provided'));
+        if (err instanceof Error) {
+          return AppResult.Err(AppError.InvalidData(err.message));
+        } else {
+          return AppResult.Err(AppError.InvalidData('An unknown error occurred'));
+        }        
       }
-    }
-    else if (!req.file && existingMetadata) {
+      if (metadata.type !== fileType) {
+        return AppResult.Err(AppError.InvalidData('Metadata type does not match the file type'));
+      }
+    } else if (!req.file && existingMetadata) {
       metadata = existingMetadata;
+      // Validating existing metadata type against file type
+      if (metadata.type !== fileType) {
+        return AppResult.Err(AppError.InvalidData('Existing metadata type does not match the file type'));
+      }
     } else {
-      // Placeholder for dynamically determined attributes
       let dynamicAttributes = {};
-
       // Image metadata extraction
       if (fileType === 'image') {
         const imageMetadata = await sharp(req.file?.buffer).metadata();

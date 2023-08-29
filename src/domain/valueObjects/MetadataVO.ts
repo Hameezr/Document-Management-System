@@ -29,10 +29,10 @@ export class MetadataSchema {
 
     validateAttributes() {
         const requiredAttributes = getRequiredAttributesForType(this._type);
-        const attributeKeys = this._attributes.map(attr => attr.split(':')[0]); // Extract keys from 'key:value' strings
+        const attributeKeys = this._attributes.map(attr => attr.split(':')[0]);
         for (const required of requiredAttributes) {
             if (!attributeKeys.includes(required)) {
-                throw new Error(`Missing required attribute ${required} for type ${this._type}`);
+                throw new Error(`Missing required attribute: ${required} for type ${this._type}`);
             }
         }
     }
@@ -64,8 +64,7 @@ export class MetadataSchema {
             case "application":
                 defaultAttributes = {
                     version: null,
-                    platform: null,
-                    architecture: null
+                    pages: null
                 };
                 break;
             case "image":
@@ -90,8 +89,10 @@ function getRequiredAttributesForType(type: string): string[] {
             return ['duration', 'bitrate', 'channels'];
         case 'image':
             return ['resolution', 'colorDepth', 'format'];
-        // Add other types as needed
+        case 'application':
+            return ['pages', 'version'];
+        case 'video':
+            return ['resolution', 'fps', 'duration'];
         default:
             return [];
-    }
-}
+    }}

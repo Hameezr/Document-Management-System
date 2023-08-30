@@ -5,6 +5,7 @@ import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { Request } from "express";
 import { AppError, AppResult } from '@carbonteq/hexapp';
 import { injectable, inject } from "inversify";
+import { logGenericMessage } from "../../infrastructure/logger/logger";
 import TYPES from "../../infrastructure/DIContainer/types";
 
 import sharp from 'sharp';
@@ -18,30 +19,36 @@ export class DocumentService {
   async createDocument(req: Request): Promise<AppResult<DocumentDTO>> {
     const newDocumentDtoResult = await this.processFile(req);
     if (newDocumentDtoResult.isOk()) {
+      logGenericMessage('Service', 'Created');
       const documentEntity = DocumentEntity.createFromDTO(newDocumentDtoResult.unwrap());
       await this.documentRepository.create(documentEntity);
       return AppResult.Ok(DocumentDTO.from(documentEntity));
     } else {
+      logGenericMessage('Service', 'Create', 'error');
       return newDocumentDtoResult;
     }
   }
 
   async getAllDocuments(): Promise<AppResult<DocumentEntity[]>> {
     const documents = await this.documentRepository.findAll();
+    logGenericMessage('Service', 'FetchAll');
     return AppResult.Ok(documents);
   }
 
   async getDocumentById(id: string): Promise<AppResult<DocumentDTO>> {
     const documentEntity = await this.documentRepository.findById(id);
     if (documentEntity) {
+      logGenericMessage('Service', 'FetchById');
       return AppResult.Ok(DocumentDTO.from(documentEntity));
     }
+    logGenericMessage('Service', 'FetchById', 'error');
     return AppResult.Err(AppError.NotFound(`Document with ID ${id} not found`));
   }
 
   async updateDocument(req: Request, documentId: string): Promise<AppResult<DocumentDTO>> {
     const documentDtoResult = await this.processFile(req);
     if (documentDtoResult.isErr()) {
+      logGenericMessage('Service', 'Update', 'error');
       return documentDtoResult;
     }
 
@@ -58,15 +65,18 @@ export class DocumentService {
     existingDocument.setUpdatedAt(new Date());
 
     await this.documentRepository.update(existingDocument);
+    logGenericMessage('Service', 'Update');
     return AppResult.Ok(DocumentDTO.from(existingDocument));
   }
 
   async deleteDocument(id: string): Promise<AppResult<void>> {
     const existingDocument = await this.documentRepository.findById(id);
     if (!existingDocument) {
+      logGenericMessage('Service', 'Delete', 'error');
       return AppResult.Err(AppError.NotFound("Document not found"));
     }
     await this.documentRepository.delete(id);
+    logGenericMessage('Service', 'Delete');
     return AppResult.Ok(undefined); // App result requires an argument even if it is void, hence passing undefined
   }
 

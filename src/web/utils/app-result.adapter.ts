@@ -4,8 +4,7 @@ import {
     AppResult,
     AppErrStatus,
     DtoValidationError,
-    AppError,
-    DtoValidationResult,
+    AppError
 } from '@carbonteq/hexapp';
 
 export class HttpResponse {

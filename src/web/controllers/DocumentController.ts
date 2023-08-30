@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { handleResult } from "../utils/results";
 import { injectable, inject } from "inversify";
+import { logGenericMessage } from "../../infrastructure/logger/logger";
 import TYPES from "../../infrastructure/DIContainer/types";
 
 @injectable()
@@ -11,8 +12,10 @@ export class DocumentController {
   createDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentDTOResult = await this.documentService.createDocument(req);
     if (documentDTOResult.isOk()) {
+      logGenericMessage('Controller', 'Created');
       handleResult(res, documentDTOResult, 201);
     } else {
+      logGenericMessage('Controller', 'Create', 'error');
       next(documentDTOResult);
     }
   }
@@ -20,8 +23,10 @@ export class DocumentController {
   getAllDocuments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentsResult = await this.documentService.getAllDocuments();
     if (documentsResult.isOk()) {
+      logGenericMessage('Controller', 'FetchAll');
       handleResult(res, documentsResult, 200);
     } else {
+      logGenericMessage('Controller', 'FetchAll', 'error');
       next(documentsResult);
     }
   }
@@ -29,8 +34,10 @@ export class DocumentController {
   getDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentEntityResult = await this.documentService.getDocumentById(req.params.id);
     if (documentEntityResult.isOk()) {
+      logGenericMessage('Controller', 'FetchById');
       handleResult(res, documentEntityResult, 200);
     } else {
+      logGenericMessage('Controller', 'FetchById', 'error');
       next(documentEntityResult);
     }
   }
@@ -38,8 +45,10 @@ export class DocumentController {
   updateDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const updatedDocumentDTOResult = await this.documentService.updateDocument(req, req.params.id);
     if (updatedDocumentDTOResult.isOk()) {
+      logGenericMessage('Controller', 'Update');
       handleResult(res, updatedDocumentDTOResult, 200);
     } else {
+      logGenericMessage('Controller', 'Update', 'error');
       next(updatedDocumentDTOResult);
     }
   }
@@ -47,8 +56,10 @@ export class DocumentController {
   deleteDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const deleteDocumentResult = await this.documentService.deleteDocument(req.params.id);
     if (deleteDocumentResult.isOk()) {
+      logGenericMessage('Controller', 'Delete');
       handleResult(res, deleteDocumentResult, 200, "Document deleted successfully");
     } else {
+      logGenericMessage('Controller', 'Delete', 'error');
       next(deleteDocumentResult);
     }
   }

@@ -1,5 +1,5 @@
 import { DocumentDTO, NewDocumentDto } from "../DTO/DocumentDTO";
-import { DocumentRepository } from "../../infrastructure/repositories/DocumentRepository";
+import { DocumentRepository } from "../../domain/entities/DocumentRepo.interface"
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { Request } from "express";
@@ -80,93 +80,104 @@ export class DocumentService {
     return AppResult.Ok(undefined); // App result requires an argument even if it is void, hence passing undefined
   }
 
-  private async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
-    const { title, tags, author } = req.body;
-    const { originalname, mimetype } = req.file || {};
+  private validateAndParseTags(tags: string): any[] {
     let tagsArray: any = [];
-    const fileType = mimetype?.split("/")[0] || ''; // Extract file type from content type (e.g., "image/png" -> "image")
-
-    if (!req.file) {
-      return AppResult.Err(AppError.InvalidData("No file provided"));
-    }
     try {
       if (tags) {
         tagsArray = JSON.parse(tags);
       }
     } catch (e) {
-      return AppResult.Err(AppError.InvalidData("Invalid tags format"));
+      throw new Error("Invalid tags format");
+    }
+    return tagsArray;
+  }
+
+  private validateAndParseMetadata(metadata: string, fileType: string): MetadataSchema {
+    const parsedMetadata = JSON.parse(metadata);
+    const metadataSchema = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
+    metadataSchema.validateAttributes();
+    if (metadataSchema.type !== fileType) {
+      throw new Error('Metadata type does not match the file type');
+    }
+    return metadataSchema;
+  }
+
+  private async extractDynamicMetadata(fileType: string, fileBuffer: Buffer): Promise<any> {
+    let dynamicAttributes = {};
+  
+    // Image metadata extraction
+    if (fileType === 'image') {
+      const imageMetadata = await sharp(fileBuffer).metadata();
+      dynamicAttributes = {
+        resolution: `${imageMetadata.width}x${imageMetadata.height}`,
+        colorDepth: `${imageMetadata.channels} channels`,
+        format: imageMetadata.format
+      };
+    }
+  
+    // Audio metadata extraction
+    if (fileType === 'audio') {
+      const audioMetadata = await parseBuffer(fileBuffer, 'audio/mpeg');
+      dynamicAttributes = {
+        duration: audioMetadata.format.duration,
+        bitrate: audioMetadata.format.bitrate,
+        channels: audioMetadata.format.numberOfChannels
+      };
+    }
+  
+    // PDF metadata extraction
+    if (fileType === 'application') {
+      const data = await pdf(fileBuffer);
+      dynamicAttributes = {
+        pages: data.numpages,
+        version: data.info.PDFFormatVersion
+      };
+    }
+    const attributesArray = Object.entries(dynamicAttributes).map(
+      ([key, value]) => `${key}: ${value}`
+    );
+  
+    return attributesArray;
+  }
+  
+
+  private async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
+    const { title, author } = req.body;
+    const { originalname, mimetype } = req.file || {};
+    const fileType = mimetype?.split("/")[0] || '';
+
+    if (!req.file) {
+      return AppResult.Err(AppError.InvalidData("No file provided"));
     }
 
-    let existingDocumentData;
-    if (req.params.id) {
-      const existingDocumentResult = await this.getDocumentById(req.params.id);
-      if (existingDocumentResult.isOk()) {
-        existingDocumentData = existingDocumentResult.unwrap().serialize();
+    let tagsArray;
+    try {
+      tagsArray = this.validateAndParseTags(req.body.tags);
+    } catch (e) {
+      if (e instanceof Error) {
+        return AppResult.Err(AppError.InvalidData(e.message));
+      } else {
+        return AppResult.Err(AppError.InvalidData('An unknown error occurred'));
       }
     }
-    const existingMetadata = existingDocumentData?.file.metadata;
+    
 
     let metadata: MetadataSchema;
-    if (req.body.metadata) {
-      const parsedMetadata = JSON.parse(req.body.metadata);
-      metadata = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
-      try {
-        metadata.validateAttributes();
-      } catch (err) {
-        if (err instanceof Error) {
-          return AppResult.Err(AppError.InvalidData(err.message));
-        } else {
-          return AppResult.Err(AppError.InvalidData('An unknown error occurred'));
-        }        
+    try {
+      if (req.body.metadata) {
+        metadata = this.validateAndParseMetadata(req.body.metadata, fileType);
+      } else {
+        const dynamicAttributes = await this.extractDynamicMetadata(fileType, req.file.buffer);
+        metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes);
       }
-      if (metadata.type !== fileType) {
-        return AppResult.Err(AppError.InvalidData('Metadata type does not match the file type'));
+    } catch (e) {
+      if (e instanceof Error) {
+        return AppResult.Err(AppError.InvalidData(e.message));
+      } else {
+        return AppResult.Err(AppError.InvalidData('An unknown error occurred'));
       }
-    } else if (!req.file && existingMetadata) {
-      metadata = existingMetadata;
-      // Validating existing metadata type against file type
-      if (metadata.type !== fileType) {
-        return AppResult.Err(AppError.InvalidData('Existing metadata type does not match the file type'));
-      }
-    } else {
-      let dynamicAttributes = {};
-      // Image metadata extraction
-      if (fileType === 'image') {
-        const imageMetadata = await sharp(req.file?.buffer).metadata();
-        dynamicAttributes = {
-          resolution: `${imageMetadata.width}x${imageMetadata.height}`,
-          colorDepth: `${imageMetadata.channels} channels`,
-          format: imageMetadata.format
-        };
-      }
-      // Audio metadata extraction
-      if (fileType === 'audio' && req.file?.buffer) {
-        const audioMetadata = await parseBuffer(req.file?.buffer, 'audio/mpeg');
-        dynamicAttributes = {
-          duration: audioMetadata.format.duration,
-          bitrate: audioMetadata.format.bitrate,
-          channels: audioMetadata.format.numberOfChannels
-        };
-      }
-
-      // PDF metadata extraction
-      if (fileType === 'application') {
-        // PDF metadata extraction
-        if (req.file?.mimetype === 'application/pdf') {
-          const data = await pdf(req.file.buffer);
-          dynamicAttributes = {
-            pages: data.numpages,
-            version: data.info.PDFFormatVersion
-          };
-        }
-      }
-      const attributesArray = Object.entries(dynamicAttributes).map(
-        ([key, value]) => `${key}: ${value}`
-      );
-
-      // Finally, creating the MetadataSchema
-      metadata = MetadataSchema.createFromAttributes(fileType, attributesArray);
     }
+    
 
     const newDocumentDtoValidationResult = NewDocumentDto.create({
       title,

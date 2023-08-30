@@ -1,4 +1,5 @@
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
+import {DocumentRepository} from '../../domain/entities/DocumentRepo.interface'
 import { PrismaClient, Document as PrismaDocument, File } from '@prisma/client';
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { injectable } from "inversify";
@@ -10,13 +11,6 @@ type MyJsonObject = { [key: string]: MyJsonValue };
 type MyJsonArray = MyJsonValue[];
 type MyJsonValue = MyJsonPrimitive | MyJsonObject | MyJsonArray;
 
-export interface DocumentRepository {
-  create(documentEntity: DocumentEntity): Promise<void>;
-  findById(id: string): Promise<DocumentEntity | null>;
-  findAll(): Promise<DocumentEntity[]>;
-  update(documentEntity: DocumentEntity): Promise<void>;
-  delete(id: string): Promise<void>;
-}
 @injectable()
 export class DocRepository implements DocumentRepository {
   async create(documentEntity: DocumentEntity): Promise<void> {

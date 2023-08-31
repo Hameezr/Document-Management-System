@@ -1,13 +1,15 @@
+import { DocumentType } from "../shared/type.utils";
+
 export class MetadataSchema {
-    private readonly _type: "audio" | "video" | "application" | "image";
+    private readonly _type: DocumentType;
     private readonly _attributes: string[];
 
-    constructor(type: "audio" | "video" | "application" | "image", attributes: any) {
+    constructor(type: DocumentType, attributes: any) {
         this._type = type;
         this._attributes = attributes;
     }
 
-    get type(): "audio" | "video" | "application" | "image" {
+    get type(): DocumentType {
         return this._type;
     }
 

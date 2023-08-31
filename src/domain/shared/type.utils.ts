@@ -1,0 +1,1 @@
+export type DocumentType = "audio" | "video" | "application" | "image";

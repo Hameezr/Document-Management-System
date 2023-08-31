@@ -1,5 +1,6 @@
 import { IDocument, DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
+import { DocumentType } from "../../domain/shared/type.utils";
 import { IEntity } from "../../domain/utils/BaseEntity";
 import { BaseDto, DtoValidationResult } from '@carbonteq/hexapp';
 import { z } from 'zod';
@@ -14,7 +15,7 @@ type SimpleDocumentData = {
     contentType: string;
     tags?: { key: string; name: string }[];
     metadata: {
-      type: "audio" | "video" | "application" | "image";
+      type: DocumentType;
       attributes: string[];
     };
   };

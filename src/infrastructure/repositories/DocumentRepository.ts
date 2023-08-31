@@ -94,7 +94,6 @@ export class DocRepository implements DocumentRepository {
     });
   }
 
-
   async delete(id: string): Promise<void> {
     await prisma.document.delete({ where: { id: id } });
   }

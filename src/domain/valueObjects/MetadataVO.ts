@@ -43,7 +43,6 @@ export class MetadataSchema {
         }
     }
 
-
     static createFromAttributes(type: string, attributes?: any): MetadataSchema {
         // Validate the type or throw an error
         if (!["audio", "video", "application", "image"].includes(type)) {

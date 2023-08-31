@@ -88,7 +88,7 @@ export class ProcessFileService {
         return metadataSchema;
     }
 
-    private async extractDynamicMetadata(fileType: string, fileBuffer: Buffer): Promise<any> {
+    private async extractDynamicMetadata(fileType: string, fileBuffer: Buffer): Promise<Record<string, string | number>> {
         let dynamicAttributes = {};
 
         // Image metadata extraction
@@ -119,10 +119,6 @@ export class ProcessFileService {
                 version: data.info.PDFFormatVersion
             };
         }
-        const attributesArray = Object.entries(dynamicAttributes).map(
-            ([key, value]) => `${key}: ${value}`
-        );
-
-        return attributesArray;
+        return dynamicAttributes;
     }
 }

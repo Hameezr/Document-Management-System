@@ -2,7 +2,7 @@ import { DocumentType } from "../shared/type.utils";
 
 export class MetadataSchema {
     private readonly _type: DocumentType;
-    private readonly _attributes: string[];
+    private readonly _attributes: Record<string, any>;;
 
     constructor(type: DocumentType, attributes: any) {
         this._type = type;
@@ -13,27 +13,26 @@ export class MetadataSchema {
         return this._type;
     }
 
-    get attributes(): string[] {
+    get attributes(): Record<string, any> {
         return this._attributes;
     }
 
-    equals(other: MetadataSchema): boolean {
-        return this._type === other._type && this.arraysEqual(this._attributes, other._attributes);
-    }
+    // equals(other: MetadataSchema): boolean {
+    //     return this._type === other._type && this.arraysEqual(this._attributes, other._attributes);
+    // }
 
-    private arraysEqual(a: string[], b: string[]): boolean {
-        if (a.length !== b.length) return false;
-        for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) return false;
-        }
-        return true;
-    }
+    // private arraysEqual(a: string[], b: string[]): boolean {
+    //     if (a.length !== b.length) return false;
+    //     for (let i = 0; i < a.length; i++) {
+    //         if (a[i] !== b[i]) return false;
+    //     }
+    //     return true;
+    // }
 
     validateAttributes() {
         const requiredAttributes = getRequiredAttributesForType(this._type);
-        const attributeKeys = this._attributes.map(attr => attr.split(':')[0]); // Extract keys from 'key:value' strings
+        const attributeKeys = Object.keys(this._attributes);
         const missingAttributes = [];
-
         for (const required of requiredAttributes) {
             if (!attributeKeys.includes(required)) {
                 missingAttributes.push(required);
@@ -44,6 +43,7 @@ export class MetadataSchema {
             throw new Error(`Missing required attributes for type ${this._type}: ${missingAttributes.join(', ')}`);
         }
     }
+
 
     static createFromAttributes(type: string, attributes?: any): MetadataSchema {
         // Validate the type or throw an error

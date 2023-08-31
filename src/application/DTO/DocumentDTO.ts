@@ -16,7 +16,7 @@ type SimpleDocumentData = {
     tags?: { key: string; name: string }[];
     metadata: {
       type: DocumentType;
-      attributes: string[];
+      attributes: Record<string, string | number | boolean>;
     };
   };
   author: string;
@@ -40,7 +40,7 @@ export class NewDocumentDto extends BaseDto {
           z.literal("application"),
           z.literal("image"),
         ]),
-        attributes: z.array(z.string().nonempty()),
+        attributes: z.record(z.union([z.string(), z.number(), z.boolean()])),
       }),
     }),
     author: z.string().nonempty(),

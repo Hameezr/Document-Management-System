@@ -27,7 +27,7 @@ export class DocRepository implements DocumentRepository {
             metadata: {
               create: {
                 type: documentEntity.file.metadata.type,
-                attributes: JSON.stringify(documentEntity.file.metadata.attributes)
+                attributes: documentEntity.file.metadata.attributes
               }
             }
           }
@@ -85,7 +85,7 @@ export class DocRepository implements DocumentRepository {
             metadata: {
               update: {
                 type: documentEntity.file.metadata.type,
-                attributes: JSON.stringify(documentEntity.file.metadata.attributes)
+                attributes: documentEntity.file.metadata.attributes
               }
             }
           }
@@ -114,7 +114,7 @@ export class DocRepository implements DocumentRepository {
     const tagsArray = this.parseTags(JSON.parse(JSON.stringify(document.file.tags)));
 
     // Use MetadataSchema's creation method to generate the schema instance
-    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, JSON.parse(document.file.metadata?.attributes));
+    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.attributes);
 
     const fileData = {
       fileName: document.file.fileName,

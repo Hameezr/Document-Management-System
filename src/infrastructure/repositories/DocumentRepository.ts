@@ -27,12 +27,12 @@ export class DocRepository implements DocumentRepository {
             metadata: {
               create: {
                 type: documentEntity.file.metadata.type,
-                attributes: documentEntity.file.metadata.attributes
+                attributes: documentEntity.file.metadata.attributes,
+                author: documentEntity.file.metadata.author
               }
             }
           }
         },
-        author: documentEntity.author,
         createdAt: documentEntity.createdAt,
         updatedAt: documentEntity.updatedAt
       }
@@ -74,7 +74,6 @@ export class DocRepository implements DocumentRepository {
       where: { id: documentEntity.id },
       data: {
         title: documentEntity.title,
-        author: documentEntity.author,
         updatedAt: new Date(),
         file: {
           update: {
@@ -85,7 +84,8 @@ export class DocRepository implements DocumentRepository {
             metadata: {
               update: {
                 type: documentEntity.file.metadata.type,
-                attributes: documentEntity.file.metadata.attributes
+                attributes: documentEntity.file.metadata.attributes,
+                author: documentEntity.file.metadata.author // Moved author here
               }
             }
           }
@@ -113,8 +113,8 @@ export class DocRepository implements DocumentRepository {
     // Convert tags using the parseTags utility method
     const tagsArray = this.parseTags(JSON.parse(JSON.stringify(document.file.tags)));
 
-    // Use MetadataSchema's creation method to generate the schema instance
-    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.attributes);
+    // Using MetadataSchema's creation method to generate the schema instance
+    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.author, document.file.metadata?.attributes);
 
     const fileData = {
       fileName: document.file.fileName,
@@ -124,7 +124,7 @@ export class DocRepository implements DocumentRepository {
       metadata: metadataSchema
     };
 
-    const documentEntity = DocumentEntity.create(document.title, fileData, document.author).unwrap();
+    const documentEntity = DocumentEntity.create(document.title, fileData).unwrap();
     documentEntity.setId(document.id);
     documentEntity.setCreatedAt(document.createdAt);
     documentEntity.setUpdatedAt(document.updatedAt);

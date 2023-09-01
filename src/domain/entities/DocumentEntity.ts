@@ -12,7 +12,6 @@ export interface IDocument extends IEntity {
         tags: { key: string; name: string }[];
         metadata: MetadataSchema;
     };
-    author: string;
 }
 
 export class DocumentEntity extends BaseEntity implements IDocument {
@@ -24,7 +23,6 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         tags: { key: string; name: string }[];
         metadata: MetadataSchema;
     };
-    private _author: string;
 
     private constructor(title: string, file: {
         fileName: string;
@@ -32,16 +30,15 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         contentType: string;
         tags: { key: string; name: string }[];
         metadata: MetadataSchema;
-    }, author: string) {
+    }) {
         super();
         this._title = title;
         this._file = file;
-        this._author = author;
     }
 
     static createFromDTO(newDocumentDto: NewDocumentDto): DocumentEntity {
-        const { title, author, file } = newDocumentDto.data; 
-        return new DocumentEntity(title, file, author);
+        const { title, file } = newDocumentDto.data;
+        return new DocumentEntity(title, file);
     }
 
     static create(title: string, file: {
@@ -50,8 +47,8 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         contentType: string;
         tags: { key: string; name: string }[];
         metadata: MetadataSchema;
-    }, author: string): Result<DocumentEntity, Error> {
-        const document = new DocumentEntity(title, file, author);
+    }): Result<DocumentEntity, Error> {
+        const document = new DocumentEntity(title, file);
         return Result(document);
     }
 
@@ -73,10 +70,6 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         return this._file;
     }
 
-    public get author(): string {
-        return this._author;
-    }
-
     public set file(file: {
         fileName: string;
         fileExtension: string;
@@ -85,10 +78,6 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         metadata: MetadataSchema;
     }) {
         this._file = file;
-    }
-
-    public set author(author: string) {
-        this._author = author;
     }
 
     setId(id: string) {
@@ -104,12 +93,11 @@ export class DocumentEntity extends BaseEntity implements IDocument {
     }
 
     serialize(): IDocument {
-        const { id, title, file, author, createdAt, updatedAt } = this;
+        const { id, title, file, createdAt, updatedAt } = this;
         return {
             id,
             title,
             file,
-            author,
             createdAt,
             updatedAt
         };

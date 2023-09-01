@@ -59,7 +59,6 @@ export class DocumentService {
 
     existingDocument.title = updatedDocumentEntity.title;
     existingDocument.file = updatedDocumentEntity.file;
-    existingDocument.author = updatedDocumentEntity.author;
     existingDocument.setUpdatedAt(new Date());
 
     await this.documentRepository.update(existingDocument);

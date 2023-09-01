@@ -33,10 +33,10 @@ export class ProcessFileService {
         let metadata: MetadataSchema;
         try {
             if (req.body.metadata) {
-                metadata = this.validateAndParseMetadata(req.body.metadata, fileType);
+                metadata = this.validateAndParseMetadata(req.body.metadata, fileType, author);
             } else {
                 const dynamicAttributes = await this.extractDynamicMetadata(fileType, req.file.buffer);
-                metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes);
+                metadata = MetadataSchema.createFromAttributes(fileType, author, dynamicAttributes);
             }
         } catch (e) {
             if (e instanceof Error) {
@@ -56,7 +56,6 @@ export class ProcessFileService {
                 tags: tagsArray,
                 metadata
             },
-            author
         });
 
         if (newDocumentDtoValidationResult.isErr()) {
@@ -78,9 +77,9 @@ export class ProcessFileService {
         return tagsArray;
     }
 
-    private validateAndParseMetadata(metadata: string, fileType: string): MetadataSchema {
+    private validateAndParseMetadata(metadata: string, fileType: string, author: string): MetadataSchema {
         const parsedMetadata = JSON.parse(metadata);
-        const metadataSchema = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes);
+        const metadataSchema = new MetadataSchema(parsedMetadata.type, author, parsedMetadata.attributes);
         metadataSchema.validateAttributes();
         if (metadataSchema.type !== fileType) {
             throw new Error('Metadata type does not match the file type');

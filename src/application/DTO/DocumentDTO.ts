@@ -17,9 +17,9 @@ type SimpleDocumentData = {
     metadata: {
       type: DocumentType;
       attributes: Record<string, string | number | boolean>;
+      author: string;
     };
   };
-  author: string;
 };
 
 export class NewDocumentDto extends BaseDto {
@@ -41,9 +41,9 @@ export class NewDocumentDto extends BaseDto {
           z.literal("image"),
         ]),
         attributes: z.record(z.union([z.string(), z.number(), z.boolean()])),
+        author: z.string().nonempty(),
       }),
     }),
-    author: z.string().nonempty(),
   });
 
   private constructor(readonly data: NewDocumentData) { super() }
@@ -56,9 +56,8 @@ export class NewDocumentDto extends BaseDto {
         file: {
           ...simpleData.file,
           tags: simpleData.file.tags || [],
-          metadata: new MetadataSchema(simpleData.file.metadata.type, simpleData.file.metadata.attributes)
+          metadata: new MetadataSchema(simpleData.file.metadata.type, simpleData.file.metadata.author, simpleData.file.metadata.attributes)
         },
-        author: simpleData.author
       };      
       return new NewDocumentDto(transformedData);
     });

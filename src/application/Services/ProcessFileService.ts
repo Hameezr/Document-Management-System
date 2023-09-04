@@ -13,7 +13,7 @@ export class ProcessFileService {
         const { title, author } = req.body;
         const { originalname, mimetype } = req.file || {};
         const fileType = mimetype?.split("/")[0] || '';
-        let specificFileType = mimetype?.split("/")[1];
+        let specificFileType = mimetype?.split("/")[1] || '';
 
         if (!req.file) {
             return AppResult.Err(AppError.InvalidData("No file provided"));
@@ -107,7 +107,7 @@ export class ProcessFileService {
         return metadataSchema;
     }
 
-    private async extractDynamicMetadata(fileType: string, specificFileType: string | undefined, fileBuffer: Buffer): Promise<Record<string, string | number>> {
+    private async extractDynamicMetadata(fileType: string, specificFileType: string, fileBuffer: Buffer): Promise<Record<string, string | number>> {
         let dynamicAttributes = {};
         // Image metadata extraction
         if (fileType === 'image') {

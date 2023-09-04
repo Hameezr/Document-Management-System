@@ -13,7 +13,6 @@ export class ProcessFileService {
         const { title, author } = req.body;
         const { originalname, mimetype } = req.file || {};
         const fileType = mimetype?.split("/")[0] || '';
-
         if (!req.file) {
             return AppResult.Err(AppError.InvalidData("No file provided"));
         }
@@ -33,10 +32,12 @@ export class ProcessFileService {
         let metadata: MetadataSchema;
         try {
             if (req.body.metadata) {
+                console.log(req.body.metadata)
                 metadata = this.validateAndParseMetadata(req.body.metadata, fileType, author);
+                console.log('after: ', metadata)
             } else {
                 const dynamicAttributes = await this.extractDynamicMetadata(fileType, req.file.buffer);
-                metadata = MetadataSchema.createFromAttributes(fileType, author, dynamicAttributes);
+                metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes, author);
             }
         } catch (e) {
             if (e instanceof Error) {
@@ -60,6 +61,7 @@ export class ProcessFileService {
 
         if (newDocumentDtoValidationResult.isErr()) {
             const validationError = newDocumentDtoValidationResult.unwrapErr();
+            console.log('here-> ', validationError)
             return AppResult.Err(AppError.InvalidData(validationError.message));
         }
         return AppResult.Ok(newDocumentDtoValidationResult.unwrap());
@@ -79,7 +81,7 @@ export class ProcessFileService {
 
     private validateAndParseMetadata(metadata: string, fileType: string, author: string): MetadataSchema {
         const parsedMetadata = JSON.parse(metadata);
-        const metadataSchema = new MetadataSchema(parsedMetadata.type, author, parsedMetadata.attributes);
+        const metadataSchema = new MetadataSchema(parsedMetadata.type, parsedMetadata.attributes, author);
         metadataSchema.validateAttributes();
         if (metadataSchema.type !== fileType) {
             throw new Error('Metadata type does not match the file type');

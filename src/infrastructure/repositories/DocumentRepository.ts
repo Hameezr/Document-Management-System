@@ -1,5 +1,5 @@
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
-import {DocumentRepository} from '../../domain/entities/DocumentRepo.interface'
+import { DocumentRepository } from '../../domain/entities/DocumentRepo.interface'
 import { PrismaClient, Document as PrismaDocument, File } from '@prisma/client';
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { injectable } from "inversify";
@@ -28,7 +28,7 @@ export class DocRepository implements DocumentRepository {
               create: {
                 type: documentEntity.file.metadata.type,
                 attributes: documentEntity.file.metadata.attributes,
-                author: documentEntity.file.metadata.author
+                ...(documentEntity.file.metadata.author ? { author: documentEntity.file.metadata.author } : {})
               }
             }
           }
@@ -85,7 +85,7 @@ export class DocRepository implements DocumentRepository {
               update: {
                 type: documentEntity.file.metadata.type,
                 attributes: documentEntity.file.metadata.attributes,
-                author: documentEntity.file.metadata.author // Moved author here
+                ...(documentEntity.file.metadata.author ? { author: documentEntity.file.metadata.author } : {})
               }
             }
           }
@@ -114,7 +114,7 @@ export class DocRepository implements DocumentRepository {
     const tagsArray = this.parseTags(JSON.parse(JSON.stringify(document.file.tags)));
 
     // Using MetadataSchema's creation method to generate the schema instance
-    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.author, document.file.metadata?.attributes);
+    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.attributes, document.file.metadata?.author);
 
     const fileData = {
       fileName: document.file.fileName,

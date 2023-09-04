@@ -2,10 +2,10 @@ import { DocumentType } from "../shared/type.utils";
 
 export class MetadataSchema {
     private readonly _type: DocumentType;
-    private readonly _author: string;
+    private readonly _author?: string;
     private readonly _attributes: Record<string, any>;
 
-    constructor(type: DocumentType, author: string, attributes: any) {
+    constructor(type: DocumentType, attributes: any, author?: string) {
         this._type = type;
         this._author = author;
         this._attributes = attributes;
@@ -15,7 +15,7 @@ export class MetadataSchema {
         return this._type;
     }
 
-    get author(): string {
+    get author(): string | undefined{
         return this._author;
     }
 
@@ -39,7 +39,7 @@ export class MetadataSchema {
     }
 
 
-    static createFromAttributes(type: string, author: string, attributes?: any): MetadataSchema {
+    static createFromAttributes(type: string, attributes?: any, author?: string): MetadataSchema {
         // Validate the type or throw an error
         if (!["audio", "video", "application", "image"].includes(type)) {
             throw new Error("Invalid metadata type provided.");
@@ -79,8 +79,17 @@ export class MetadataSchema {
 
         // If attributes are provided, use them; if not, use defaultAttributes
         const finalAttributes = attributes || defaultAttributes;
-        return new MetadataSchema(type as any, author, finalAttributes);
+        return new MetadataSchema(type as any, finalAttributes, author);
     }
+
+    serialize() {
+        return {
+            type: this.type,
+            attributes: this.attributes,
+            ...(this._author ? { author: this._author } : {}) 
+        };
+    }
+
 }
 
 // Helper function to get required attributes based on file type

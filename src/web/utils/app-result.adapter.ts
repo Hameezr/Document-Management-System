@@ -45,7 +45,6 @@ export class HttpResponse {
         } else {
             actualError = err;
         }
-    
         // Check the type of the actual error
         if (actualError instanceof DtoValidationError) {
             const DtoError = new DtoValidationError(actualError.message);

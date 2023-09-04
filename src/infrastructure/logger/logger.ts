@@ -11,9 +11,9 @@ const logger = winston.createLogger({
 
 // It will log to console as well if it is not production env
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple(),
-  }));
+  // logger.add(new winston.transports.Console({
+  //   format: winston.format.simple(),
+  // }));
 }
 
 // To log a generic message

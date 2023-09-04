@@ -66,6 +66,9 @@ export class NewDocumentDto extends BaseDto {
       return new NewDocumentDto(transformedData);
     });
   }
+  public static getSchema() {
+    return this.schema;
+  }
 }
 
 type PublicDocument = NewDocumentData;

@@ -31,7 +31,6 @@ export class HttpResponse {
             case AppErrStatus.ExternalServiceFailure:
                 throw AppError.ExternalServiceFailure(errorMessage);
             default:
-                console.log("sendFromAppResult default case");
                 throw AppError.Generic("An unknown error occurred");
         }
     }

@@ -32,9 +32,7 @@ export class ProcessFileService {
         let metadata: MetadataSchema;
         try {
             if (req.body.metadata) {
-                console.log(req.body.metadata)
                 metadata = this.validateAndParseMetadata(req.body.metadata, fileType, author);
-                console.log('after: ', metadata)
             } else {
                 const dynamicAttributes = await this.extractDynamicMetadata(fileType, req.file.buffer);
                 metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes, author);
@@ -47,8 +45,7 @@ export class ProcessFileService {
             }
         }
 
-
-        const newDocumentDtoValidationResult = NewDocumentDto.create({
+        const validationResult = NewDocumentDto.getSchema().safeParse({
             title,
             file: {
                 fileName: originalname || '',
@@ -59,13 +56,33 @@ export class ProcessFileService {
             },
         });
 
+        if (!validationResult.success) {
+            const detailedErrors = validationResult.error.errors.map(issue => {
+                const humanReadablePath = issue.path.join('.');
+                const pathArray = issue.path;
+                if (pathArray[0] === 'file' && pathArray[1] === 'tags' || 'name' && pathArray[3]) {
+                    const index = pathArray[2];
+                    const fieldName = pathArray[3];
+                    if (issue.message === "Required") {
+                        return `The '${fieldName}' field is required in the tags object at index ${index}.`;
+                    } else if (issue.message.includes("String must contain")) {
+                        return `The '${fieldName}' field should not be empty in the tags object at index ${index}.`;
+                    }
+                }
+                return `${humanReadablePath} -> ${issue.message}`;
+            }).join(', ');
+            return AppResult.Err(AppError.InvalidData(detailedErrors));
+        }
+
+        const newDocumentDtoValidationResult = NewDocumentDto.create(validationResult.data);
         if (newDocumentDtoValidationResult.isErr()) {
             const validationError = newDocumentDtoValidationResult.unwrapErr();
-            console.log('here-> ', validationError)
+
             return AppResult.Err(AppError.InvalidData(validationError.message));
         }
         return AppResult.Ok(newDocumentDtoValidationResult.unwrap());
     }
+
 
     private validateAndParseTags(tags: string): any[] {
         let tagsArray: any = [];

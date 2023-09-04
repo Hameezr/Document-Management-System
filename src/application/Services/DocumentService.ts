@@ -27,11 +27,24 @@ export class DocumentService {
     }
   }
 
-  async getAllDocuments(): Promise<AppResult<DocumentEntity[]>> {
-    const documents = await this.documentRepository.findAll();
+  async getAllDocuments(page: number): Promise<AppResult<{ documents: DocumentEntity[], total: number, currentPage: number, pageSize: number }>> {
+    if (page < 1) {
+      return AppResult.Err(new Error("Page number cannot be less than 1"));
+    }
+
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+    const result = await this.documentRepository.findAll(skip, pageSize);
+
+    if (result.documents.length === 0 && result.total > 0) {
+      return AppResult.Err(new Error("No documents exist on this page"));
+    }
+
     logGenericMessage('Service', 'FetchAll');
-    return AppResult.Ok(documents);
+    return AppResult.Ok(result);
   }
+
+
 
   async getDocumentById(id: string): Promise<AppResult<DocumentDTO>> {
     const documentEntity = await this.documentRepository.findById(id);

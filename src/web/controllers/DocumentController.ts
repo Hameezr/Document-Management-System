@@ -6,7 +6,7 @@ import { logGenericMessage } from "../../infrastructure/logger/logger";
 
 export class DocumentController {
   private documentService: DocumentService;
-  constructor(documentService: DocumentService) {this.documentService = documentService}
+  constructor(documentService: DocumentService) { this.documentService = documentService }
 
   createDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentDTOResult = await this.documentService.createDocument(req);
@@ -20,15 +20,18 @@ export class DocumentController {
   }
 
   getAllDocuments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const documentsResult = await this.documentService.getAllDocuments();
+    const page = parseInt(req.query.page as string) || 1;
+    const documentsResult = await this.documentService.getAllDocuments(page);
     if (documentsResult.isOk()) {
       logGenericMessage('Controller', 'FetchAll');
-      handleResult(res, documentsResult, 200);
+      const result = documentsResult.unwrap();
+      res.status(200).json(result);
     } else {
       logGenericMessage('Controller', 'FetchAll', 'error');
       next(documentsResult);
     }
   }
+
 
   getDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentEntityResult = await this.documentService.getDocumentById(req.params.id);

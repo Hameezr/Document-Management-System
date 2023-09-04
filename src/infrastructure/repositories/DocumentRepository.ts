@@ -39,8 +39,14 @@ export class DocRepository implements DocumentRepository {
     });
   }
 
-  async findAll(): Promise<DocumentEntity[]> {
+  async findAll(skip: number, take: number): Promise<{ documents: DocumentEntity[], total: number, currentPage: number, pageSize: number }> {
+    const total = await prisma.document.count();
+    const currentPage = Math.floor(skip / take) + 1;
+    const pageSize = take;
+
     const documents = await prisma.document.findMany({
+      skip,
+      take,
       include: {
         file: {
           include: {
@@ -49,8 +55,16 @@ export class DocRepository implements DocumentRepository {
         }
       }
     });
-    return documents.map(doc => this.prismaDocumentToEntity(doc));
+    const documentEntities = documents.map(doc => this.prismaDocumentToEntity(doc));
+    return {
+      total,
+      currentPage,
+      pageSize,
+      documents: documentEntities
+    };
   }
+
+
 
   async findById(id: string): Promise<DocumentEntity | null> {
     const document = await prisma.document.findUnique({

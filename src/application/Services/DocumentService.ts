@@ -55,6 +55,16 @@ export class DocumentService {
       return AppResult.Err(AppError.NotFound(`Document with ID ${documentId} not found`));
     }
 
+    // Checking content type of the new file if it matches the existing document's content type
+    const newContentType = documentDtoResult.unwrap().data.file.contentType;
+    const existingContentType = existingDocument.file.contentType;
+    const newFileType = newContentType.split("/")[0];
+    const existingFileType = existingContentType.split("/")[0];
+
+    if (newFileType !== existingFileType) {
+      return AppResult.Err(AppError.InvalidData(`Cannot change the file type from ${existingFileType} to ${newFileType}`));
+    }
+
     const updatedDocumentEntity = DocumentEntity.createFromDTO(documentDtoResult.unwrap());
 
     existingDocument.title = updatedDocumentEntity.title;
@@ -65,6 +75,7 @@ export class DocumentService {
     logGenericMessage('Service', 'Update');
     return AppResult.Ok(DocumentDTO.from(existingDocument));
   }
+
 
   async deleteDocument(id: string): Promise<AppResult<void>> {
     const existingDocument = await this.documentRepository.findById(id);

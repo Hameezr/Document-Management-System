@@ -13,6 +13,8 @@ export class ProcessFileService {
         const { title, author } = req.body;
         const { originalname, mimetype } = req.file || {};
         const fileType = mimetype?.split("/")[0] || '';
+        let specificFileType = mimetype?.split("/")[1];
+
         if (!req.file) {
             return AppResult.Err(AppError.InvalidData("No file provided"));
         }
@@ -34,7 +36,7 @@ export class ProcessFileService {
             if (req.body.metadata) {
                 metadata = this.validateAndParseMetadata(req.body.metadata, fileType, author);
             } else {
-                const dynamicAttributes = await this.extractDynamicMetadata(fileType, req.file.buffer);
+                const dynamicAttributes = await this.extractDynamicMetadata(fileType, specificFileType, req.file.buffer);
                 metadata = MetadataSchema.createFromAttributes(fileType, dynamicAttributes, author);
             }
         } catch (e) {
@@ -77,7 +79,6 @@ export class ProcessFileService {
         const newDocumentDtoValidationResult = NewDocumentDto.create(validationResult.data);
         if (newDocumentDtoValidationResult.isErr()) {
             const validationError = newDocumentDtoValidationResult.unwrapErr();
-
             return AppResult.Err(AppError.InvalidData(validationError.message));
         }
         return AppResult.Ok(newDocumentDtoValidationResult.unwrap());
@@ -106,9 +107,8 @@ export class ProcessFileService {
         return metadataSchema;
     }
 
-    private async extractDynamicMetadata(fileType: string, fileBuffer: Buffer): Promise<Record<string, string | number>> {
+    private async extractDynamicMetadata(fileType: string, specificFileType: string | undefined, fileBuffer: Buffer): Promise<Record<string, string | number>> {
         let dynamicAttributes = {};
-
         // Image metadata extraction
         if (fileType === 'image') {
             const imageMetadata = await sharp(fileBuffer).metadata();
@@ -131,11 +131,25 @@ export class ProcessFileService {
 
         // PDF metadata extraction
         if (fileType === 'application') {
-            const data = await pdf(fileBuffer);
-            dynamicAttributes = {
-                pages: data.numpages,
-                version: data.info.PDFFormatVersion
-            };
+            if (specificFileType === 'vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                dynamicAttributes = {
+                    pages: 'N/A for docx'
+                };
+            } else if (specificFileType === 'vnd.ms-excel') {
+                dynamicAttributes = {
+                    sheets: 4
+                };
+            } else if (specificFileType === 'vnd.ms-powerpoint') {
+                dynamicAttributes = {
+                    pages: 'N/A for ppt',
+                }
+            } else {
+                const data = await pdf(fileBuffer);
+                dynamicAttributes = {
+                    pages: data.numpages,
+                    version: data.info.PDFFormatVersion
+                };
+            }
         }
         return dynamicAttributes;
     }

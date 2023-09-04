@@ -108,7 +108,7 @@ function getRequiredAttributesForType(type: string): string[] {
         case 'image':
             return ['resolution', 'colorDepth', 'format'];
         case 'application':
-            return ['pages', 'version'];
+            return ['pages'];
         case 'video':
             return ['resolution', 'fps', 'duration'];
         default:

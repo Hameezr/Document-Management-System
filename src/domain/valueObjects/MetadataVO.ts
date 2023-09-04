@@ -2,7 +2,7 @@ import { DocumentType } from "../shared/type.utils";
 
 export class MetadataSchema {
     private readonly _type: DocumentType;
-    private readonly _author?: string;
+    private _author?: string;
     private readonly _attributes: Record<string, any>;
 
     constructor(type: DocumentType, attributes: any, author?: string) {
@@ -15,12 +15,16 @@ export class MetadataSchema {
         return this._type;
     }
 
-    get author(): string | undefined{
+    get author(): string | undefined {
         return this._author;
     }
 
     get attributes(): Record<string, any> {
         return this._attributes;
+    }
+
+    setAuthor(author: string) {
+        this._author = author;
     }
 
     validateAttributes() {
@@ -79,14 +83,18 @@ export class MetadataSchema {
 
         // If attributes are provided, use them; if not, use defaultAttributes
         const finalAttributes = attributes || defaultAttributes;
-        return new MetadataSchema(type as any, finalAttributes, author);
+        const metadata = new MetadataSchema(type as any, finalAttributes);
+        if (author) {
+            metadata.setAuthor(author)
+        }
+        return metadata;
     }
 
     serialize() {
         return {
             type: this.type,
             attributes: this.attributes,
-            ...(this._author ? { author: this._author } : {}) 
+            ...(this._author ? { author: this._author } : {})
         };
     }
 

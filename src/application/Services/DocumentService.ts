@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { DocumentDTO } from "../DTO/DocumentDTO";
-import { DocumentRepository } from "../../domain/entities/DocumentRepo.interface"
-import { DocumentEntity } from "../../domain/entities/DocumentEntity";
+import { DocumentRepository } from "../../domain/entities/Document/DocumentRepo.interface"
+import { DocumentEntity } from "../../domain/entities/Document/DocumentEntity";
 import { ProcessFileService } from "./ProcessFileService";
 import { AppError, AppResult } from '@carbonteq/hexapp';
 import { injectable, inject } from "inversify";

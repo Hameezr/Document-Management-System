@@ -1,5 +1,5 @@
-import { DocumentEntity } from "../../domain/entities/DocumentEntity";
-import { DocumentRepository } from '../../domain/entities/DocumentRepo.interface'
+import { DocumentEntity } from "../../domain/entities/Document/DocumentEntity";
+import { DocumentRepository } from '../../domain/entities/Document/DocumentRepo.interface'
 import { prismaDocumentToEntity } from "./utils/repo.utils";
 import { PrismaClient } from '@prisma/client';
 import { injectable } from "inversify";

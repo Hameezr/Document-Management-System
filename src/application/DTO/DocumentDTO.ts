@@ -1,4 +1,4 @@
-import { IDocument, DocumentEntity } from "../../domain/entities/DocumentEntity";
+import { IDocument, DocumentEntity } from "../../domain/entities/Document/DocumentEntity";
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { DocumentType } from "../../domain/shared/type.utils";
 import { IEntity } from "../../domain/utils/BaseEntity";

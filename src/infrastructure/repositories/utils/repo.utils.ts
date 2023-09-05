@@ -1,4 +1,4 @@
-import { DocumentEntity } from "../../../domain/entities/DocumentEntity";
+import { DocumentEntity } from "../../../domain/entities/Document/DocumentEntity";
 import { MetadataSchema } from "../../../domain/valueObjects/MetadataVO";
 import { Document as PrismaDocument, File } from '@prisma/client';
 

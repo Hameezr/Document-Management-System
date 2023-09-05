@@ -1,15 +1,10 @@
 import { DocumentEntity } from "../../domain/entities/DocumentEntity";
 import { DocumentRepository } from '../../domain/entities/DocumentRepo.interface'
-import { PrismaClient, Document as PrismaDocument, File } from '@prisma/client';
-import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
+import { prismaDocumentToEntity } from "./utils/repo.utils";
+import { PrismaClient } from '@prisma/client';
 import { injectable } from "inversify";
 
 const prisma = new PrismaClient();
-
-type MyJsonPrimitive = string | number | boolean | null;
-type MyJsonObject = { [key: string]: MyJsonValue };
-type MyJsonArray = MyJsonValue[];
-type MyJsonValue = MyJsonPrimitive | MyJsonObject | MyJsonArray;
 
 @injectable()
 export class DocRepository implements DocumentRepository {
@@ -43,7 +38,6 @@ export class DocRepository implements DocumentRepository {
     const total = await prisma.document.count();
     const currentPage = Math.floor(skip / take) + 1;
     const pageSize = take;
-
     const documents = await prisma.document.findMany({
       skip,
       take,
@@ -55,7 +49,7 @@ export class DocRepository implements DocumentRepository {
         }
       }
     });
-    const documentEntities = documents.map(doc => this.prismaDocumentToEntity(doc));
+    const documentEntities = documents.map(doc => prismaDocumentToEntity(doc));
     return {
       total,
       currentPage,
@@ -63,8 +57,6 @@ export class DocRepository implements DocumentRepository {
       documents: documentEntities
     };
   }
-
-
 
   async findById(id: string): Promise<DocumentEntity | null> {
     const document = await prisma.document.findUnique({
@@ -78,7 +70,7 @@ export class DocRepository implements DocumentRepository {
       }
     });
     if (document) {
-      return this.prismaDocumentToEntity(document);
+      return prismaDocumentToEntity(document);
     }
     return null;
   }
@@ -110,39 +102,5 @@ export class DocRepository implements DocumentRepository {
 
   async delete(id: string): Promise<void> {
     await prisma.document.delete({ where: { id: id } });
-  }
-
-  private parseTags(tags: MyJsonValue): { key: string; name: string; }[] {
-    if (Array.isArray(tags)) {
-      return tags.filter(tag => typeof tag === "object" && tag !== null && "key" in tag && "name" in tag) as { key: string; name: string; }[];
-    }
-    return [];
-  }
-
-  private prismaDocumentToEntity(document: PrismaDocument & { file?: (File & { metadata?: any } | null); }): DocumentEntity {
-    if (!document.file) {
-      throw new Error("Document does not have associated file data");
-    }
-
-    // Convert tags using the parseTags utility method
-    const tagsArray = this.parseTags(JSON.parse(JSON.stringify(document.file.tags)));
-
-    // Using MetadataSchema's creation method to generate the schema instance
-    const metadataSchema = MetadataSchema.createFromAttributes(document.file.metadata?.type, document.file.metadata?.attributes, document.file.metadata?.author);
-
-    const fileData = {
-      fileName: document.file.fileName,
-      fileExtension: document.file.fileExtension,
-      contentType: document.file.contentType,
-      tags: tagsArray,
-      metadata: metadataSchema
-    };
-
-    const documentEntity = DocumentEntity.create(document.title, fileData).unwrap();
-    documentEntity.setId(document.id);
-    documentEntity.setCreatedAt(document.createdAt);
-    documentEntity.setUpdatedAt(document.updatedAt);
-
-    return documentEntity;
   }
 }

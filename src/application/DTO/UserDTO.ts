@@ -1,5 +1,5 @@
 import { UserEntity } from "../../domain/entities/User/UserEntity";
-import { BaseDto } from '@carbonteq/hexapp';
+import { BaseDto, DtoValidationResult } from '@carbonteq/hexapp';
 import { z } from 'zod';
 
 type NewUserData = {
@@ -17,9 +17,11 @@ export class NewUserDto extends BaseDto {
 
   private constructor(readonly data: NewUserData) { super() }
 
-  static create(data: unknown): NewUserDto {
+  static create(data: unknown): DtoValidationResult<NewUserDto> {
     const res = BaseDto.validate<NewUserData>(NewUserDto.schema, data);
-    return new NewUserDto(res.unwrap());
+    return res.map((validatedData) => {
+      return new NewUserDto(validatedData);
+    });
   }  
 
   public static getSchema() {

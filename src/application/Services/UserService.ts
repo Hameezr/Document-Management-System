@@ -16,13 +16,13 @@ export class UserService {
             newUserDto.data.email,
             newUserDto.data.password
         );
-
         if (userEntityResult.isOk()) {
             const userEntity = userEntityResult.unwrap();
             await this.userRepository.createUser(userEntity);
             return AppResult.Ok(UserDTO.from(userEntity));
         } else {
-            return AppResult.Err(AppError.Generic("Failed to create user"));
+            const error = userEntityResult.unwrapErr();
+            return AppResult.Err(AppError.InvalidData(error.message));
         }
     }
 

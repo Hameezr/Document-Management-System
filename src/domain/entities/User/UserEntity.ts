@@ -1,5 +1,5 @@
 import { BaseEntity, IEntity } from "../../utils/BaseEntity";
-import { Result } from "oxide.ts";
+import { Result, Err, Ok } from "oxide.ts";
 import { NewUserDto } from "../../../application/DTO/UserDTO";
 
 export interface IUser extends IEntity {
@@ -29,8 +29,11 @@ export class UserEntity extends BaseEntity implements IUser {
   }
 
   static create(username: string, email: string, password: string): Result<UserEntity, Error> {
+    if (!username || !email || !password) {
+      return Err(new Error("Missing required fields"));
+    }
     const user = new UserEntity(username, email, password);
-    return Result(user);;
+    return Ok(user);
   }
 
   public get username(): string {

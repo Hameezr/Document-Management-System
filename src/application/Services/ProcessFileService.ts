@@ -14,6 +14,7 @@ export class ProcessFileService {
         const { originalname, mimetype } = req.file || {};
         const fileType = mimetype?.split("/")[0] || '';
         let specificFileType = mimetype?.split("/")[1] || '';
+        const ownerId = 'ffd78991-3798-492d-a1f1-6f1641fa8482';
 
         if (!req.file) {
             return AppResult.Err(AppError.InvalidData("No file provided"));
@@ -49,6 +50,7 @@ export class ProcessFileService {
 
         const validationResult = NewDocumentDto.getSchema().safeParse({
             title,
+            ownerId,
             file: {
                 fileName: originalname || '',
                 fileExtension: originalname?.split(".").pop() || "",

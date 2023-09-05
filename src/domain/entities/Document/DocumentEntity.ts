@@ -5,6 +5,7 @@ import { NewDocumentDto } from "../../../application/DTO/DocumentDTO";
 
 export interface IDocument extends IEntity {
     title: string;
+    ownerId: string;
     file: {
         fileName: string;
         fileExtension: string;
@@ -16,6 +17,7 @@ export interface IDocument extends IEntity {
 
 export class DocumentEntity extends BaseEntity implements IDocument {
     private _title: string;
+    private _ownerId: string;
     private _file: {
         fileName: string;
         fileExtension: string;
@@ -24,7 +26,7 @@ export class DocumentEntity extends BaseEntity implements IDocument {
         metadata: MetadataSchema;
     };
 
-    private constructor(title: string, file: {
+    private constructor(title: string, ownerId: string, file: {
         fileName: string;
         fileExtension: string;
         contentType: string;
@@ -33,27 +35,32 @@ export class DocumentEntity extends BaseEntity implements IDocument {
     }) {
         super();
         this._title = title;
+        this._ownerId = ownerId;
         this._file = file;
     }
 
     static createFromDTO(newDocumentDto: NewDocumentDto): DocumentEntity {
-        const { title, file } = newDocumentDto.data;
-        return new DocumentEntity(title, file);
+        const { title, ownerId, file } = newDocumentDto.data;
+        return new DocumentEntity(title, ownerId, file);
     }
 
-    static create(title: string, file: {
+    static create(title: string, ownerId: string, file: {
         fileName: string;
         fileExtension: string;
         contentType: string;
         tags: { key: string; name: string }[];
         metadata: MetadataSchema;
     }): Result<DocumentEntity, Error> {
-        const document = new DocumentEntity(title, file);
+        const document = new DocumentEntity(title, ownerId, file);
         return Result(document);
     }
 
     public get title(): string {
         return this._title;
+    }
+
+    public get ownerId(): string {
+        return this._ownerId;
     }
 
     public set title(title: string) {
@@ -93,9 +100,10 @@ export class DocumentEntity extends BaseEntity implements IDocument {
     }
 
     serialize(): IDocument {
-        const { id, title, file, createdAt, updatedAt } = this;
+        const { id, title, ownerId, file, createdAt, updatedAt } = this;
         return {
             id,
+            ownerId,
             title,
             file,
             createdAt,

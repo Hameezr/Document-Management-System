@@ -5,10 +5,11 @@ import { IEntity } from "../../domain/utils/BaseEntity";
 import { BaseDto, DtoValidationResult } from '@carbonteq/hexapp';
 import { z } from 'zod';
 
-type NewDocumentData = Omit<IDocument, keyof IEntity>;
+type NewDocumentData = Omit<IDocument, keyof IEntity> & { ownerId: string };
 
 type SimpleDocumentData = {
   title: string;
+  ownerId: string;
   file: {
     fileName: string;
     fileExtension: string;
@@ -25,6 +26,7 @@ type SimpleDocumentData = {
 export class NewDocumentDto extends BaseDto {
   private static readonly schema = z.object({
     title: z.string().nonempty(),
+    ownerId: z.string().nonempty(), // Added ownerId schema
     file: z.object({
       fileName: z.string().nonempty(),
       fileExtension: z.string().nonempty(),
@@ -53,6 +55,7 @@ export class NewDocumentDto extends BaseDto {
     return res.map((simpleData) => {
       const transformedData: NewDocumentData = {
         title: simpleData.title,
+        ownerId: simpleData.ownerId,
         file: {
           ...simpleData.file,
           tags: simpleData.file.tags || [],

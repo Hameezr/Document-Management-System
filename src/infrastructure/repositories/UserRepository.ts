@@ -8,19 +8,22 @@ const prisma = new PrismaClient();
 @injectable()
 export class UserRepositoryImpl implements UserRepository {
     async createUser(userEntity: UserEntity): Promise<void> {
-        await prisma.user.create({
-            data: {
-                id: userEntity.id,
-                username: userEntity.username,
-                email: userEntity.email,
-                password: userEntity.password,
-                ownedDocuments: {
-                    set: userEntity.ownedDocuments
-                },
-                createdAt: userEntity.createdAt,
-                updatedAt: userEntity.updatedAt
-            }
-        });
+        const data: any = {
+            id: userEntity.id,
+            username: userEntity.username,
+            email: userEntity.email,
+            password: userEntity.password,
+            createdAt: userEntity.createdAt,
+            updatedAt: userEntity.updatedAt
+        };
+
+        if (userEntity.ownedDocuments.length > 0) {
+            data.ownedDocuments = {
+                connect: userEntity.ownedDocuments.map(docId => ({ id: docId }))
+            };
+        }
+
+        await prisma.user.create({ data });
     }
 
     async findUserById(id: string): Promise<UserEntity | null> {

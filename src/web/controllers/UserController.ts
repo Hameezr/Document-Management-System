@@ -17,5 +17,4 @@ export class UserController {
       next(userDTOResult);
     }
   }
-  // Add more methods for login, logout, etc. following the same pattern
 }

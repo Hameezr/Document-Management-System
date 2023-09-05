@@ -33,7 +33,7 @@ export function prismaDocumentToEntity(document: PrismaDocument & { file?: (File
         metadata: metadataSchema
     };
 
-    const documentEntity = DocumentEntity.create(document.title, fileData).unwrap();
+    const documentEntity = DocumentEntity.create(document.title, document.ownerId, fileData).unwrap();
     documentEntity.setId(document.id);
     documentEntity.setCreatedAt(document.createdAt);
     documentEntity.setUpdatedAt(document.updatedAt);

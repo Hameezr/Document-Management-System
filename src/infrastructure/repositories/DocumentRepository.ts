@@ -13,6 +13,7 @@ export class DocRepository implements DocumentRepository {
       data: {
         id: documentEntity.id,
         title: documentEntity.title,
+        ownerId: documentEntity.ownerId,
         file: {
           create: {
             fileName: documentEntity.file.fileName,
@@ -33,6 +34,7 @@ export class DocRepository implements DocumentRepository {
       }
     });
   }
+
 
   async findAll(skip: number, take: number): Promise<{ documents: DocumentEntity[], total: number, currentPage: number, pageSize: number }> {
     const total = await prisma.document.count();
@@ -58,7 +60,7 @@ export class DocRepository implements DocumentRepository {
     };
   }
 
-  async findById(id: string): Promise<DocumentEntity> {
+  async findById(id: string): Promise<DocumentEntity | null> {
     const document = await prisma.document.findUnique({
       where: { id: id },
       include: {
@@ -72,7 +74,7 @@ export class DocRepository implements DocumentRepository {
     if (document) {
       return prismaDocumentToEntity(document);
     }
-    throw new Error(`Document with ID ${id} not found`);
+    return null
   }
 
   async update(documentEntity: DocumentEntity): Promise<void> {

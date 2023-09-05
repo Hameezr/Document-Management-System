@@ -30,7 +30,7 @@ export class UserEntity extends BaseEntity implements IUser {
 
   static create(username: string, email: string, password: string): Result<UserEntity, Error> {
     const user = new UserEntity(username, email, password);
-    return Result(user);
+    return Result(user);;
   }
 
   public get username(): string {

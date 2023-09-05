@@ -58,7 +58,7 @@ export class DocRepository implements DocumentRepository {
     };
   }
 
-  async findById(id: string): Promise<DocumentEntity | null> {
+  async findById(id: string): Promise<DocumentEntity> {
     const document = await prisma.document.findUnique({
       where: { id: id },
       include: {
@@ -72,7 +72,7 @@ export class DocRepository implements DocumentRepository {
     if (document) {
       return prismaDocumentToEntity(document);
     }
-    return null;
+    throw new Error(`Document with ID ${id} not found`);
   }
 
   async update(documentEntity: DocumentEntity): Promise<void> {

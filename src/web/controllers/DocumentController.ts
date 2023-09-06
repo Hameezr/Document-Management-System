@@ -58,10 +58,8 @@ export class DocumentController {
   deleteDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const deleteDocumentResult = await this.documentService.deleteDocument(req.params.id);
     if (deleteDocumentResult.isOk()) {
-      logGenericMessage('Controller', 'Delete');
       handleResult(res, deleteDocumentResult, 200, "Document deleted successfully");
     } else {
-      logGenericMessage('Controller', 'Delete', 'error');
       next(deleteDocumentResult);
     }
   }

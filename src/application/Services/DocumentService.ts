@@ -85,7 +85,7 @@ export class DocumentService {
   async deleteDocument(id: string): Promise<AppResult<void>> {
     const existingDocument = await this.documentRepository.findById(id);
     if (!existingDocument) {
-      return AppResult.Err(AppError.NotFound("Document not found"));
+      return AppResult.Err(AppError.NotFound(`Document with id: ${id} does not exist`));
     }
     await this.documentRepository.delete(id);
     return AppResult.Ok(undefined); // App result requires an argument even if it is void, hence passing undefined

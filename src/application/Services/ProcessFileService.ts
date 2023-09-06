@@ -14,7 +14,7 @@ export class ProcessFileService {
         const { originalname, mimetype } = req.file || {};
         const fileType = mimetype?.split("/")[0] || '';
         let specificFileType = mimetype?.split("/")[1] || '';
-        const ownerId = '2305b6f2-7b41-4b77-82c0-db507d49e06a';
+        const ownerId = '3381ee41-a705-4069-9939-86b078529d7f';
 
         if (!req.file) {
             return AppResult.Err(AppError.InvalidData("No file provided"));

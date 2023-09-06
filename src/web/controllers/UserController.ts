@@ -14,4 +14,45 @@ export class UserController {
             next(userDTOResult);
         }
     }
+
+    getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { skip, take } = req.query;
+        const skipNumber = Number(skip) || 0;  // Default to 0 if not provided
+        const takeNumber = Number(take) || 10; // Default to 10 if not provided
+
+        const usersResult = await this.userService.getAllUsers(skipNumber, takeNumber);
+
+        if (usersResult.isOk()) {
+            handleResult(res, usersResult, 200);
+        } else {
+            next(usersResult);
+        }
+    }
+
+    getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const userResult = await this.userService.getUserById(req.params.id);
+        if (userResult.isOk()) {
+            handleResult(res, userResult, 200);
+        } else {
+            next(userResult);
+        }
+    }
+
+    updateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const updateResult = await this.userService.updateUser(req.params.id, req.body);
+        if (updateResult.isOk()) {
+            handleResult(res, updateResult, 200);
+        } else {
+            next(updateResult);
+        }
+    }
+
+    deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const deleteResult = await this.userService.deleteUser(req.params.id);
+        if (deleteResult.isOk()) {
+            handleResult(res, deleteResult, 200, "User deleted successfully");
+        } else {
+            next(deleteResult);
+        }
+    }
 }

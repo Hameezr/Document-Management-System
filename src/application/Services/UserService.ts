@@ -26,15 +26,48 @@ export class UserService {
         }
     }
 
+    async getAllUsers(skip: number, take: number): Promise<AppResult<{ users: UserEntity[], total: number, currentPage: number, pageSize: number }>> {
+        const result = await this.userRepository.findAll(skip, take);
+        const usersArray = result.users;
+        if (usersArray.length > 0) {
+            return AppResult.Ok(result);
+        }
+        return AppResult.Err(AppError.NotFound("No users found"));
+    }
+
+
+
     async getUserById(id: string): Promise<AppResult<UserDTO>> {
         const user = await this.userRepository.findUserById(id);
         if (user) {
-            logGenericMessage('Service', 'FetchById');
             return AppResult.Ok(UserDTO.from(user));
         }
-        logGenericMessage('Service', 'FetchById', 'error');
         return AppResult.Err(AppError.NotFound(`User with ID ${id} not found`));
     }
 
-    // Add more methods for authentication, document ownership, etc.
+    async updateUser(id: string, updateUserDto: NewUserDto): Promise<AppResult<UserDTO>> {
+        const existingUser = await this.userRepository.findUserById(id);
+        if (!existingUser) {
+            return AppResult.Err(AppError.NotFound(`User with ID ${id} not found`));
+        }
+
+        const updatedUserEntity = UserEntity.createFromDTO(updateUserDto);
+        existingUser.username = updatedUserEntity.username;
+        existingUser.email = updatedUserEntity.email;
+        existingUser.password = updatedUserEntity.password;
+        existingUser.setUpdatedAt(new Date());
+
+        await this.userRepository.update(existingUser);
+        return AppResult.Ok(UserDTO.from(existingUser));
+    }
+
+
+    async deleteUser(id: string): Promise<AppResult<void>> {
+        const existingUser = await this.userRepository.findUserById(id);
+        if (!existingUser) {
+            return AppResult.Err(AppError.NotFound(`User with ID ${id} not found`));
+        }
+        await this.userRepository.delete(id);
+        return AppResult.Ok(undefined); // AppResult requires an argument even if it is void, hence passing undefined
+    }
 }

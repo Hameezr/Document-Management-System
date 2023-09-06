@@ -11,7 +11,7 @@ import TYPES from "../../infrastructure/DIContainer/types";
 @injectable()
 export class DocumentService {
   constructor(@inject(TYPES.DocumentRepository) private documentRepository: DocumentRepository,
-    @inject(TYPES.ProcessFileService) private processFileService: ProcessFileService) { }
+    @inject(TYPES.ProcessFileService) private processFileService: ProcessFileService) {}
 
   async createDocument(req: Request): Promise<AppResult<DocumentDTO>> {
     

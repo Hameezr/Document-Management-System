@@ -23,11 +23,9 @@ export class DocumentController {
     const page = parseInt(req.query.page as string) || 1;
     const documentsResult = await this.documentService.getAllDocuments(page);
     if (documentsResult.isOk()) {
-      logGenericMessage('Controller', 'FetchAll');
       const result = documentsResult.unwrap();
       res.status(200).json(result);
     } else {
-      logGenericMessage('Controller', 'FetchAll', 'error');
       next(documentsResult);
     }
   }
@@ -36,10 +34,8 @@ export class DocumentController {
   getDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentEntityResult = await this.documentService.getDocumentById(req.params.id);
     if (documentEntityResult.isOk()) {
-      logGenericMessage('Controller', 'FetchById');
       handleResult(res, documentEntityResult, 200);
     } else {
-      logGenericMessage('Controller', 'FetchById', 'error');
       next(documentEntityResult);
     }
   }
@@ -47,10 +43,8 @@ export class DocumentController {
   updateDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const updatedDocumentDTOResult = await this.documentService.updateDocument(req, req.params.id);
     if (updatedDocumentDTOResult.isOk()) {
-      logGenericMessage('Controller', 'Update');
       handleResult(res, updatedDocumentDTOResult, 200);
-    } else {
-      logGenericMessage('Controller', 'Update', 'error');
+    } else {4
       next(updatedDocumentDTOResult);
     }
   }

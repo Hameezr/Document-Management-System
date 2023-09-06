@@ -52,6 +52,18 @@ export class UserEntity extends BaseEntity implements IUser {
     return this._ownedDocuments;
   }
 
+  public set username(username: string) {
+    this._username = username;
+  }
+
+  public set email(email: string) {
+    this._email = email;
+  }
+
+  public set password(password: string) {
+    this._password = password;
+  }
+
   public addOwnedDocument(documentId: string) {
     this._ownedDocuments.push(documentId);
   }

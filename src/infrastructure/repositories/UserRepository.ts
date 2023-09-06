@@ -27,27 +27,64 @@ export class UserRepositoryImpl implements UserRepository {
     }
 
     async findUserById(id: string): Promise<UserEntity | null> {
-        // const user = await prisma.user.findUnique({
-        //   where: { id: id }
-        // });
-        // if (user) {
-        //   const userEntity = new UserEntity(user.username, user.email, user.password);
-        //   userEntity.setId(user.id);
-        //   return userEntity;
-        // }
+        const user = await prisma.user.findUnique({
+            where: { id: id },
+            include: { ownedDocuments: true }
+        });
+        if (user) {
+            return prismaUserToEntity(user);
+        }
         return null;
     }
 
-    async findUserByEmail(email: string): Promise<UserEntity | null> {
-        // const user = await prisma.user.findUnique({
-        //   where: { email: email }
-        // });
-        // if (user) {
-        //   const userEntity = new UserEntity(user.username, user.email, user.password);
-        //   userEntity.setId(user.id);
-        //   return userEntity;
-        // }
-        return null;
+    async findAll(skip: number, take: number): Promise<{ users: UserEntity[], total: number, currentPage: number, pageSize: number }> {
+        const total = await prisma.user.count();
+        const currentPage = Math.floor(skip / take) + 1;
+        const pageSize = take;
+        const users = await prisma.user.findMany({
+            skip,
+            take
+        });
+        const userEntities = users.map(user => prismaUserToEntity(user));
+        return {
+            total,
+            currentPage,
+            pageSize,
+            users: userEntities
+        };
+    }
+    async update(userEntity: UserEntity): Promise<void> {
+        await prisma.user.update({
+            where: { id: userEntity.id },
+            data: {
+                username: userEntity.username,
+                email: userEntity.email,
+                password: userEntity.password,
+                updatedAt: new Date()
+            }
+        });
     }
 
+    async delete(id: string): Promise<void> {
+        await prisma.user.delete({ where: { id: id } });
+    }
+}
+function prismaUserToEntity(user: any): UserEntity {
+    const userEntityResult = UserEntity.create(user.username, user.email, user.password);
+
+    if (userEntityResult.isOk()) {
+        const userEntity = userEntityResult.unwrap();
+        userEntity.setId(user.id);
+        userEntity.setCreatedAt(new Date(user.createdAt));
+        userEntity.setUpdatedAt(new Date(user.updatedAt));
+
+        if (user.ownedDocuments) {
+            user.ownedDocuments.forEach((docId: string) => {
+                userEntity.addOwnedDocument(docId);
+            });
+        }
+        return userEntity;
+    } else {
+        throw new Error("Failed to create UserEntity from Prisma user");
+    }
 }

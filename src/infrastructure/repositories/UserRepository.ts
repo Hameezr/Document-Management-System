@@ -37,6 +37,16 @@ export class UserRepositoryImpl implements UserRepository {
         return null;
     }
 
+    async findUserByEmail(email: string): Promise<UserEntity | null> {
+        const user = await prisma.user.findUnique({
+          where: { email: email }
+        });
+        if (user) {
+          return prismaUserToEntity(user);
+        }
+        return null;
+      }
+
     async findAll(skip: number, take: number): Promise<{ users: UserEntity[], total: number, currentPage: number, pageSize: number }> {
         const total = await prisma.user.count();
         const currentPage = Math.floor(skip / take) + 1;

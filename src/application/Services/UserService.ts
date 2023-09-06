@@ -1,9 +1,9 @@
 import { AppError, AppResult } from '@carbonteq/hexapp';
 import { injectable, inject } from "inversify";
 import { UserDTO, NewUserDto } from "../DTO/UserDTO";
+import { AuthService } from './AuthService';
 import { UserRepository } from "../../domain/entities/User/UserRepo.interface";
 import { UserEntity } from "../../domain/entities/User/UserEntity";
-import { logGenericMessage } from "../../infrastructure/logger/logger";
 import TYPES from "../../infrastructure/DIContainer/types";
 
 @injectable()
@@ -24,6 +24,25 @@ export class UserService {
             const error = userEntityResult.unwrapErr();
             return AppResult.Err(AppError.InvalidData(error.message));
         }
+    }
+
+    // async login(email: string, password: string): Promise<AppResult<string>> {
+    //     const user = await this.userRepository.findByEmail(email);
+    //     if (!user || user.password !== password) {
+    //         return AppResult.Err(AppError.NotFound('Invalid email or password'));
+    //     }
+
+    //     const authService = new AuthService();
+    //     const token = authService.generateToken(user.id);
+    //     return AppResult.Ok(token);
+    // }
+
+    async getUserByEmail(email: string): Promise<AppResult<UserDTO>> {
+        const user = await this.userRepository.findUserByEmail(email);
+        if (user) {
+            return AppResult.Ok(UserDTO.from(user));
+        }
+        return AppResult.Err(AppError.NotFound(`User with email ${email} not found`));
     }
 
     async getAllUsers(skip: number, take: number): Promise<AppResult<{ users: UserEntity[], total: number, currentPage: number, pageSize: number }>> {

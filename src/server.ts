@@ -17,6 +17,11 @@ app.use("/", (req, res) => {
 });
 app.use(errorsInterceptorMiddleware());
 
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not set.');
+  process.exit(1);
+}
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

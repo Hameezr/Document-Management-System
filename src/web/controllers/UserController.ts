@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { AuthService } from '../../application/Services/AuthService';
 import { UserService } from '../../application/Services/UserService';
 import { handleResult } from '../utils/results';
 
@@ -14,6 +15,22 @@ export class UserController {
             next(userDTOResult);
         }
     }
+
+    // login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    //     const { email, password } = req.body;
+    //     const result = await this.userService.login(email, password);
+    //     handleResult(res, result, 200);
+    // }
+
+    getUserByEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const email = req.params.email;
+        const userResult = await this.userService.getUserByEmail(email);
+        if (userResult.isOk()) {
+            handleResult(res, userResult, 200);
+        } else {
+            next(userResult);
+        }
+    };
 
     getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const { skip, take } = req.query;

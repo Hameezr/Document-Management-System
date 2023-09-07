@@ -22,7 +22,6 @@ export class UserRepositoryImpl implements UserRepository {
                 connect: userEntity.ownedDocuments.map(docId => ({ id: docId }))
             };
         }
-
         await prisma.user.create({ data });
     }
 
@@ -84,21 +83,15 @@ export class UserRepositoryImpl implements UserRepository {
     }
 }
 function prismaUserToEntity(user: any): UserEntity {
-    const userEntityResult = UserEntity.create(user.username, user.email, user.password);
+    const userEntity = UserEntity.fromDatabaseObject(user.username, user.email, user.password);
+    userEntity.setId(user.id);
+    userEntity.setCreatedAt(new Date(user.createdAt));
+    userEntity.setUpdatedAt(new Date(user.updatedAt));
 
-    if (userEntityResult.isOk()) {
-        const userEntity = userEntityResult.unwrap();
-        userEntity.setId(user.id);
-        userEntity.setCreatedAt(new Date(user.createdAt));
-        userEntity.setUpdatedAt(new Date(user.updatedAt));
-
-        if (user.ownedDocuments) {
-            user.ownedDocuments.forEach((docId: string) => {
-                userEntity.addOwnedDocument(docId);
-            });
-        }
-        return userEntity;
-    } else {
-        throw new Error("Failed to create UserEntity from Prisma user");
+    if (user.ownedDocuments) {
+        user.ownedDocuments.forEach((docId: string) => {
+            userEntity.addOwnedDocument(docId);
+        });
     }
+    return userEntity;
 }

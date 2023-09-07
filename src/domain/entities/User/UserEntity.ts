@@ -1,6 +1,7 @@
 import { BaseEntity, IEntity } from "../../utils/BaseEntity";
 import { Result, Err, Ok } from "oxide.ts";
 import { NewUserDto } from "../../../application/DTO/UserDTO";
+import bcrypt from 'bcrypt';
 
 export interface IUser extends IEntity {
   username: string;
@@ -32,9 +33,15 @@ export class UserEntity extends BaseEntity implements IUser {
     if (!username || !email || !password) {
       return Err(new Error("Missing required fields"));
     }
-    const user = new UserEntity(username, email, password);
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const user = new UserEntity(username, email, hashedPassword);
     return Ok(user);
   }
+
+  static fromDatabaseObject(username: string, email: string, password: string): UserEntity {
+    return new UserEntity(username, email, password);
+  }
+
 
   public get username(): string {
     return this._username;

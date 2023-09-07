@@ -26,16 +26,16 @@ export class UserService {
         }
     }
 
-    // async login(email: string, password: string): Promise<AppResult<string>> {
-    //     const user = await this.userRepository.findByEmail(email);
-    //     if (!user || user.password !== password) {
-    //         return AppResult.Err(AppError.NotFound('Invalid email or password'));
-    //     }
+    async login(email: string, password: string): Promise<AppResult<string>> {
+        const user = await this.userRepository.findUserByEmail(email);
+        if (!user || user.password !== password) {
+            return AppResult.Err(AppError.NotFound('Invalid email or password'));
+        }
 
-    //     const authService = new AuthService();
-    //     const token = authService.generateToken(user.id);
-    //     return AppResult.Ok(token);
-    // }
+        const authService = new AuthService();
+        const token = authService.generateToken(user.id);
+        return AppResult.Ok(token);
+    }
 
     async getUserByEmail(email: string): Promise<AppResult<UserDTO>> {
         const user = await this.userRepository.findUserByEmail(email);

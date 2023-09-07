@@ -38,14 +38,18 @@ export class UserRepositoryImpl implements UserRepository {
     }
 
     async findUserByEmail(email: string): Promise<UserEntity | null> {
-        const user = await prisma.user.findUnique({
-          where: { email: email }
-        });
-        if (user) {
-          return prismaUserToEntity(user);
+        try {
+            const user = await prisma.user.findUnique({
+                where: { email: email }
+            });
+            if (user) {
+                return prismaUserToEntity(user);
+            }
+        } catch (err: unknown) {
+            throw new Error(`Failed to find email: ${err}`)
         }
         return null;
-      }
+    }
 
     async findAll(skip: number, take: number): Promise<{ users: UserEntity[], total: number, currentPage: number, pageSize: number }> {
         const total = await prisma.user.count();

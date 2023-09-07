@@ -1,0 +1,30 @@
+{
+  "audio": {
+    "duration": {
+      "type": "float",
+      "min": 0
+    },
+    "bitrate": {
+      "type": "number",
+      "min": 0,
+      "max": 400000
+    },
+    "channels": {
+      "type": "number",
+      "min": 1,
+      "max": 5
+    }
+  },
+  "image": {
+    "format": {
+      "type": "string",
+      "enum": [
+        "jpg",
+        "jpeg",
+        "png",
+        "gif",
+        "bmp"
+      ]
+    }
+  }
+}

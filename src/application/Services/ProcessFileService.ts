@@ -2,6 +2,7 @@ import { Request } from "express";
 import { AppError, AppResult } from '@carbonteq/hexapp';
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { NewDocumentDto } from "../DTO/DocumentDTO";
+import { RulesEngineService } from './RulesEngineService';
 import sharp from 'sharp';
 import { parseBuffer } from 'music-metadata';
 import pdf from 'pdf-parse';
@@ -9,6 +10,10 @@ import { injectable } from "inversify";
 
 @injectable()
 export class ProcessFileService {
+    private rulesEngineService: RulesEngineService;
+    constructor() {
+        this.rulesEngineService = new RulesEngineService();
+    }
     async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
         const { title, author } = req.body;
         const { originalname, mimetype } = req.file || {};
@@ -31,7 +36,6 @@ export class ProcessFileService {
             }
         }
 
-
         let metadata: MetadataSchema;
         try {
             if (req.body.metadata) {
@@ -46,6 +50,10 @@ export class ProcessFileService {
             } else {
                 return AppResult.Err(AppError.InvalidData('An unknown error occurred'));
             }
+        }
+        const isValid = await this.rulesEngineService.validateDocumentMetadata(fileType, metadata.attributes);
+        if (!isValid) {
+            return AppResult.Err(AppError.InvalidData('Metadata does not meet the required rules.'));
         }
 
         const validationResult = NewDocumentDto.getSchema().safeParse({
@@ -85,7 +93,6 @@ export class ProcessFileService {
         }
         return AppResult.Ok(newDocumentDtoValidationResult.unwrap());
     }
-
 
     private validateAndParseTags(tags: string): any[] {
         let tagsArray: any = [];

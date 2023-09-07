@@ -35,7 +35,6 @@ export class DocRepository implements DocumentRepository {
     });
   }
 
-
   async findAll(skip: number, take: number): Promise<{ documents: DocumentEntity[], total: number, currentPage: number, pageSize: number }> {
     const total = await prisma.document.count();
     const currentPage = Math.floor(skip / take) + 1;

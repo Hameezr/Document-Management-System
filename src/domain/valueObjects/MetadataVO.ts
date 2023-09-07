@@ -106,7 +106,7 @@ function getRequiredAttributesForType(type: string): string[] {
         case 'audio':
             return ['duration', 'bitrate', 'channels'];
         case 'image':
-            return ['resolution', 'colorDepth', 'format'];
+            return ['format'];
         case 'application':
             return ['pages'];
         case 'video':

@@ -15,5 +15,6 @@ documentRouter.get("/:id", authMiddleware, documentController.getDocumentById);
 documentRouter.get("/", authMiddleware, documentController.getAllDocuments);
 documentRouter.delete("/:id", authMiddleware, documentController.deleteDocument);
 documentRouter.put("/:id", authMiddleware, upload.single("file"), documentController.updateDocument);
+documentRouter.post('/create-rule', documentController.createRuleForDocumentType);
 
 export default documentRouter;

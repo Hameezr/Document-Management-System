@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
+import { RulesManager } from "../../application/Services/RulesManager";
 import { handleResult } from "../utils/results";
 import { logGenericMessage } from "../../infrastructure/logger/logger";
 
@@ -16,6 +17,22 @@ export class DocumentController {
     } else {
       logGenericMessage('Controller', 'Create', 'error');
       next(documentDTOResult);
+    }
+  }
+
+  createRuleForDocumentType = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const { type, rules } = req.body;
+
+    if (!type || !rules) {
+      res.status(400).json({ error: 'Document type and rule are required.' });
+      return;
+    }
+
+    try {
+      await RulesManager.createRuleForDocumentType(type, rules);
+      res.status(200).json({ message: 'Rule created successfully.' });
+    } catch (error) {
+      next(error);
     }
   }
 

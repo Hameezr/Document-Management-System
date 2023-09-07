@@ -42,7 +42,6 @@ export class UserService {
         return AppResult.Ok(token);
     }
 
-
     async getUserByEmail(email: string): Promise<AppResult<UserDTO>> {
         const user = await this.userRepository.findUserByEmail(email);
         if (user) {

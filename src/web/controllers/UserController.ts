@@ -23,7 +23,11 @@ export class UserController {
             return;
         }
         const result = await this.userService.login(email, password);
-        handleResult(res, result, 200);
+        if (result.isOk()) {
+            handleResult(res, result, 200);
+        } else {
+            next(result)
+        }
     }
 
     getUserByEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -38,8 +42,8 @@ export class UserController {
 
     getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const { skip, take } = req.query;
-        const skipNumber = Number(skip) || 0;  // Default to 0 if not provided
-        const takeNumber = Number(take) || 10; // Default to 10 if not provided
+        const skipNumber = Number(skip) || 0;
+        const takeNumber = Number(take) || 10;
 
         const usersResult = await this.userService.getAllUsers(skipNumber, takeNumber);
 

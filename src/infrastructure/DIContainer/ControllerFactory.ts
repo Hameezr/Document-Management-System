@@ -2,7 +2,7 @@ import { DocumentController } from "../../web/controllers/DocumentController";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { UserController } from "../../web/controllers/UserController";
 import { UserService } from "../../application/Services/UserService";
-import { RulesManager } from "../../application/Services/RulesManager";
+import { RulesManager } from "../../application/utils/RulesManager";
 import { Container } from "inversify";
 import TYPES from "./types";
 

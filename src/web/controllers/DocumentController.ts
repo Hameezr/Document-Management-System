@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
-import { RulesManager } from "../../application/Services/RulesManager";
+import { RulesManager } from "../../application/utils/RulesManager";
 import { handleResult } from "../utils/results";
 import { logGenericMessage } from "../../infrastructure/logger/logger";
 

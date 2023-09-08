@@ -9,7 +9,7 @@ import { UserRepositoryImpl} from '../../infrastructure/repositories/UserReposit
 
 import { IFileService } from "../../domain/shared/interfaces/IFile";
 import { FileService } from "../../application/Services/FileService";
-import { RulesManager } from "../../application/Services/RulesManager";
+import { RulesManager } from "../../application/utils/RulesManager";
 import { RulesEngineService } from "../../application/Services/RulesEngineService";
 
 import TYPES from "./types";

@@ -1,5 +1,5 @@
 import { Engine, Rule } from 'json-rules-engine';
-import { RulesManager } from './RulesManager';
+import { RulesManager } from '../utils/RulesManager';
 import { injectable, inject } from "inversify";
 import TYPES from '../../infrastructure/DIContainer/types';
 

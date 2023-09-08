@@ -1,34 +1,62 @@
-import winston from 'winston';
+import pino, { Logger as PinoBaseLogger } from 'pino';
 
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
-});
-
-// It will log to console as well if it is not production env
-if (process.env.NODE_ENV !== 'production') {
-  // logger.add(new winston.transports.Console({
-  //   format: winston.format.simple(),
-  // }));
-}
-
-// To log a generic message
-const logGenericMessage = (
-  layer: 'Controller' | 'Service' | 'Repository',
-  action: string,
-  level: 'info' | 'error' | 'warn' = 'info'
-) => {
-  const status = level === 'error' ? 'failed' : 'successful';
-  const message = `Document ${action.toLowerCase()} ${status} in ${layer}`;
-  
-  logger.log({
-    level,
-    message,
-  });
+const transportOpts = {
+  target: 'pino-pretty',
+  options: {
+    colorize: true,
+    levelFirst: true,
+    translateTime: 'yyyy-dd-mm, h:MM:ss TT',
+    singleLine: true,
+    ignore: 'hostname,pid',
+    messageFormat: '[{context}] {msg}',
+  },
 };
 
-export { logger, logGenericMessage };
+const createPinoLogger = (context: string, logLevel: string = 'info'): PinoBaseLogger => {
+  const logger = pino({
+    level: logLevel,
+    transport: {
+      ...transportOpts,
+    },
+  }, pino.destination('./logs/my-log.log'));
+
+  logger.setBindings({ context });
+
+  return logger;
+};
+
+class PinoAppLogger {
+  private logger: PinoBaseLogger;
+  private context: string;
+
+  static readonly DEFAULT_LOG_LEVEL: string = 'debug';
+  static readonly DEFAULT_CTX: string = 'default';
+
+  constructor() {
+    this.context = PinoAppLogger.DEFAULT_CTX;
+    this.logger = createPinoLogger(this.context, PinoAppLogger.DEFAULT_LOG_LEVEL);
+  }
+
+  setContext(ctx: string): void {
+    this.context = ctx;
+    this.logger.setBindings({ context: this.context });
+  }
+
+  debug(...data: any[]): void {
+    this.logger.debug(data);
+  }
+
+  info(...data: any[]): void {
+    this.logger.info(data);
+  }
+
+  warn(...data: any[]): void {
+    this.logger.warn(data);
+  }
+
+  error(...data: any[]): void {
+    this.logger.error(data);
+  }
+}
+
+export default PinoAppLogger;

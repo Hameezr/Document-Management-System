@@ -4,10 +4,13 @@ import bodyParser from "body-parser";
 import documentRouter from "./web/routes/documentRouter";
 import userRouter from "./web/routes/userRouter";
 import { errorsInterceptorMiddleware } from './web/utils/errors.interceptor';
+import AppLogger from "./infrastructure/logger/logger";
 
 dotenv.config();
 const app: Express = express();
 const port = process.env.PORT;
+
+const logger = new AppLogger();
 
 app.use(bodyParser.json());
 app.use("/document", documentRouter);
@@ -18,10 +21,11 @@ app.use("/", (req, res) => {
 app.use(errorsInterceptorMiddleware());
 
 if (!process.env.JWT_SECRET) {
-  console.error('JWT_SECRET is not set.');
+  logger.error('JWT_SECRET is not set.');
   process.exit(1);
 }
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  logger.setContext('Server');
+  logger.info('Server started...');
 });

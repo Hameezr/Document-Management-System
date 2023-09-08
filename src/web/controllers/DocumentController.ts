@@ -1,26 +1,27 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { RulesManager } from "../../application/utils/RulesManager";
+import AppLogger from "../../infrastructure/logger/logger";
 import { handleResult } from "../utils/results";
-import { logGenericMessage } from "../../infrastructure/logger/logger";
+import { log } from "console";
 
 
 export class DocumentController {
   private documentService: DocumentService;
   private rulesManager: RulesManager;
+  private logger: AppLogger;
 
-  constructor(documentService: DocumentService, rulesManager: RulesManager) {
+  constructor(documentService: DocumentService, rulesManager: RulesManager, logger: AppLogger) {
     this.documentService = documentService;
     this.rulesManager = rulesManager;
+    this.logger = logger;
   }
 
   createDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentDTOResult = await this.documentService.createDocument(req);
     if (documentDTOResult.isOk()) {
-      logGenericMessage('Controller', 'Created');
       handleResult(res, documentDTOResult, 201);
     } else {
-      logGenericMessage('Controller', 'Create', 'error');
       next(documentDTOResult);
     }
   }

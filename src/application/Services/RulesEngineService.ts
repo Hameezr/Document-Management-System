@@ -64,12 +64,34 @@ export class RulesEngineService {
                         value: value.max
                     });
                 }
-            } else if (value.type === 'string' && value.enum) {
-                conditions.push({
-                    fact: key,
-                    operator: 'in',
-                    value: value.enum
-                });
+                if (value.notEmpty) {
+                    conditions.push({
+                        fact: key,
+                        operator: 'notEqual',
+                        value: 0
+                    });
+                    conditions.push({
+                        fact: key,
+                        operator: 'notEqual',
+                        value: null
+                    }); 
+                }
+            } 
+            if (value.type === 'string') {
+                if (value.notEmpty) {
+                    conditions.push({
+                        fact: key,
+                        operator: 'notEqual',
+                        value: ""
+                    });
+                }
+                if (value.enum) {
+                    conditions.push({
+                        fact: key,
+                        operator: 'in',
+                        value: value.enum
+                    });
+                }
             }
         });
 

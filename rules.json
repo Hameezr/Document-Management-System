@@ -19,5 +19,10 @@
     }
   },
   "application": {},
-  "video": {}
+  "video": {
+    "creator": {
+      "type": "string",
+      "notEmpty": true
+    }
+  }
 }

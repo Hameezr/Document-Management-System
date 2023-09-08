@@ -109,7 +109,7 @@ function getRequiredAttributesForType(type: string): string[] {
         case 'application':
             return ['pages'];
         case 'video':
-            return ['resolution', 'fps', 'duration'];
+            return ['creator'];
         default:
             return [];
     }

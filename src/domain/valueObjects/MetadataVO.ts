@@ -1,4 +1,4 @@
-import { DocumentType } from "../shared/type.utils";
+import { DocumentType } from "../shared/types/type.utils";
 
 export class MetadataSchema {
     private readonly _type: DocumentType;
@@ -41,7 +41,6 @@ export class MetadataSchema {
             throw new Error(`Missing required attributes for type ${this._type}: ${missingAttributes.join(', ')}`);
         }
     }
-
 
     static createFromAttributes(type: string, attributes?: any, author?: string): MetadataSchema {
         // Validate the type or throw an error
@@ -104,7 +103,7 @@ export class MetadataSchema {
 function getRequiredAttributesForType(type: string): string[] {
     switch (type) {
         case 'audio':
-            return ['duration', 'bitrate', 'channels'];
+            return ['channels'];
         case 'image':
             return ['format'];
         case 'application':

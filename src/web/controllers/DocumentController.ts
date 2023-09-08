@@ -7,7 +7,12 @@ import { logGenericMessage } from "../../infrastructure/logger/logger";
 
 export class DocumentController {
   private documentService: DocumentService;
-  constructor(documentService: DocumentService) { this.documentService = documentService }
+  private rulesManager: RulesManager;
+
+  constructor(documentService: DocumentService, rulesManager: RulesManager) {
+    this.documentService = documentService;
+    this.rulesManager = rulesManager;
+  }
 
   createDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentDTOResult = await this.documentService.createDocument(req);
@@ -29,7 +34,7 @@ export class DocumentController {
     }
 
     try {
-      await RulesManager.createRuleForDocumentType(type, rules);
+      await this.rulesManager.createRuleForDocumentType(type, rules);
       res.status(200).json({ message: 'Rule created successfully.' });
     } catch (error) {
       next(error);
@@ -61,7 +66,8 @@ export class DocumentController {
     const updatedDocumentDTOResult = await this.documentService.updateDocument(req, req.params.id);
     if (updatedDocumentDTOResult.isOk()) {
       handleResult(res, updatedDocumentDTOResult, 200);
-    } else {4
+    } else {
+      4
       next(updatedDocumentDTOResult);
     }
   }

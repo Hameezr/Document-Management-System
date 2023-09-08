@@ -2,14 +2,15 @@ import { DocumentController } from "../../web/controllers/DocumentController";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { UserController } from "../../web/controllers/UserController";
 import { UserService } from "../../application/Services/UserService";
+import { RulesManager } from "../../application/Services/RulesManager";
 import { Container } from "inversify";
 import TYPES from "./types";
 
 // To create Document Controller
 export function createDocumentController(container: Container): DocumentController {
   const documentService = container.get<DocumentService>(TYPES.DocumentService);
-  // Creating and returning a new instance of DocumentController
-  return new DocumentController(documentService);
+  const rulesManager = container.get<RulesManager>(TYPES.RulesManager);
+  return new DocumentController(documentService, rulesManager);
 }
 
 // To create User Controller

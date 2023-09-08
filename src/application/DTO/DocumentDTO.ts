@@ -1,6 +1,6 @@
 import { IDocument, DocumentEntity } from "../../domain/entities/Document/DocumentEntity";
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
-import { DocumentType } from "../../domain/shared/type.utils";
+import { DocumentType } from "../../domain/shared/types/type.utils";
 import { IEntity } from "../../domain/utils/BaseEntity";
 import { BaseDto, DtoValidationResult } from '@carbonteq/hexapp';
 import { z } from 'zod';

@@ -1,14 +1,5 @@
 {
   "audio": {
-    "duration": {
-      "type": "float",
-      "min": 0
-    },
-    "bitrate": {
-      "type": "number",
-      "min": 0,
-      "max": 400000
-    },
     "channels": {
       "type": "number",
       "min": 1,
@@ -26,5 +17,7 @@
         "bmp"
       ]
     }
-  }
+  },
+  "application": {},
+  "video": {}
 }

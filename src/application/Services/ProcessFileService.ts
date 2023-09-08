@@ -3,16 +3,18 @@ import { AppError, AppResult } from '@carbonteq/hexapp';
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { NewDocumentDto } from "../DTO/DocumentDTO";
 import { RulesEngineService } from './RulesEngineService';
+import TYPES from "../../infrastructure/DIContainer/types";
+
 import sharp from 'sharp';
 import { parseBuffer } from 'music-metadata';
 import pdf from 'pdf-parse';
-import { injectable } from "inversify";
+import { injectable, inject } from "inversify";
 
 @injectable()
 export class ProcessFileService {
     private rulesEngineService: RulesEngineService;
-    constructor() {
-        this.rulesEngineService = new RulesEngineService();
+    constructor(@inject(TYPES.RulesEngineService) rulesEngineService: RulesEngineService) {
+        this.rulesEngineService = rulesEngineService;
     }
     async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
         const { title, author } = req.body;

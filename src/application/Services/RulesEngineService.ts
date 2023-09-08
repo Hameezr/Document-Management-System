@@ -1,5 +1,7 @@
 import { Engine, Rule } from 'json-rules-engine';
 import { RulesManager } from './RulesManager';
+import { injectable, inject } from "inversify";
+import TYPES from '../../infrastructure/DIContainer/types';
 
 type RuleValue = {
     type: 'number' | 'string'
@@ -13,18 +15,21 @@ type Condition = {
     operator: string;
     value: any;
 };
-
+@injectable()
 export class RulesEngineService {
     private engine: Engine;
+    private rulesManager: RulesManager;
 
-    constructor() {
+    constructor(@inject(TYPES.RulesManager) rulesManager: RulesManager) {
         this.engine = new Engine();
+        this.rulesManager = rulesManager;
     }
 
     private async loadRules(documentType: string): Promise<void> {
         this.engine = new Engine();
 
-        const rules = await RulesManager.getRules();
+        const rules = await this.rulesManager.getRules();
+        // console.log('rules I get ->', rules)
         const ruleData = rules[documentType];
         if (!ruleData) {
             throw new Error(`No rules defined for document type: ${documentType}`);
@@ -40,8 +45,9 @@ export class RulesEngineService {
             };
         }
         const conditions: Condition[] = [];
-
+        // console.log('ruleData', ruleData)
         Object.entries(ruleData).filter(([key]) => key !== 'event').forEach(([key, ruleValue]) => {
+            // console.log('value,', ruleValue)
             const value = ruleValue as RuleValue;
             if (value.type === 'number') {
                 if (value.min !== undefined) {
@@ -79,9 +85,12 @@ export class RulesEngineService {
 
 
     async validateDocumentMetadata(documentType: string, metadata: any): Promise<boolean> {
-        await this.loadRules(documentType);
-
-        const results = await this.engine.run(metadata);
-        return results.failureEvents.length === 0;
+        try {
+            await this.loadRules(documentType);
+            const results = await this.engine.run(metadata);
+            return results.failureEvents.length === 0;
+        } catch (error) {
+            throw error;
+        }
     }
 }

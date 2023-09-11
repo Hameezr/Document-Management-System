@@ -9,6 +9,7 @@ import { UserRepositoryImpl} from '../../infrastructure/repositories/UserReposit
 
 import { IFileService } from "../../domain/shared/interfaces/IFile";
 import { FileService } from "../../application/Services/FileService";
+import { RuleService } from "../../application/Services/RuleService";
 import { RulesRepository } from "../repositories/RulesRepository";
 import { MetadataValidationService } from "../../domain/services/MetadataValidationService";
 
@@ -25,6 +26,7 @@ container.bind<UserRepositoryImpl>(TYPES.UserRepository).to(UserRepositoryImpl);
 
 container.bind<IFileService>(TYPES.FileService).to(FileService);
 container.bind<RulesRepository>(TYPES.RulesRepository).to(RulesRepository);
+container.bind<RuleService>(TYPES.RuleService).to(RuleService);
 container.bind<MetadataValidationService>(TYPES.MetadataValidationService).to(MetadataValidationService);
 
 export default container;

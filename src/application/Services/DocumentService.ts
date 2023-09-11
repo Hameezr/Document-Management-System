@@ -81,7 +81,6 @@ export class DocumentService {
     return AppResult.Ok(DocumentDTO.from(existingDocument));
   }
 
-
   async deleteDocument(id: string): Promise<AppResult<void>> {
     const existingDocument = await this.documentRepository.findById(id);
     if (!existingDocument) {

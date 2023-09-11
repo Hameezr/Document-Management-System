@@ -9,6 +9,7 @@ const TYPES = {
     UserController: Symbol.for("UserController"),
 
     FileService: Symbol.for("IFileService"),
+    RuleService: Symbol.for("RuleService"),
     RulesRepository: Symbol.for("RulesRepository"),
     MetadataValidationService: Symbol.for("MetadataValidationService"),
 };

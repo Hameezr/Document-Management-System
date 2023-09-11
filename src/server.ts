@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import bodyParser from "body-parser";
 import documentRouter from "./web/routes/documentRouter";
 import userRouter from "./web/routes/userRouter";
+import ruleRouter from "./web/routes/RuleRouter";
 import { errorsInterceptorMiddleware } from './web/utils/errors.interceptor';
 import AppLogger from "./infrastructure/logger/logger";
 
@@ -15,6 +16,8 @@ const logger = new AppLogger();
 app.use(bodyParser.json());
 app.use("/document", documentRouter);
 app.use("/user", userRouter);
+app.use("/metadata", ruleRouter);
+
 app.use("/", (req, res) => {
   res.send('wront route, sir')
 });

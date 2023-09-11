@@ -1,18 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
-import { RulesRepository } from "../../infrastructure/repositories/RulesRepository";
 import AppLogger from "../../infrastructure/logger/logger";
 import { handleResult } from "../utils/results";
 
 
 export class DocumentController {
   private documentService: DocumentService;
-  private ruleRepository: RulesRepository;
   private logger: AppLogger;
 
-  constructor(documentService: DocumentService, ruleRepository: RulesRepository, logger: AppLogger) {
+  constructor(documentService: DocumentService, logger: AppLogger) {
     this.documentService = documentService;
-    this.ruleRepository = ruleRepository;
     this.logger = logger;
   }
 
@@ -22,22 +19,6 @@ export class DocumentController {
       handleResult(res, documentDTOResult, 201);
     } else {
       next(documentDTOResult);
-    }
-  }
-
-  createRuleForDocumentType = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { type, rules } = req.body;
-
-    if (!type || !rules) {
-      res.status(400).json({ error: 'Document type and rule are required.' });
-      return;
-    }
-
-    try {
-      const test = await this.ruleRepository.createRuleForDocumentType(type, rules); 
-      res.status(200).json({ message: 'Rule created successfully.' });
-    } catch (error) {
-      next(error);
     }
   }
 

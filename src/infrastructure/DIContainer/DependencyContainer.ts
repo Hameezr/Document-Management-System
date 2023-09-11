@@ -10,6 +10,7 @@ import { UserRepositoryImpl} from '../../infrastructure/repositories/UserReposit
 import { IFileService } from "../../domain/shared/interfaces/IFile";
 import { FileUtility } from "../repositories/utils/File.utils";
 import { RuleService } from "../../application/Services/RuleService";
+import { IRulesProvider } from "../../domain/shared/interfaces/IRulesProvider";
 import { RulesRepository } from "../repositories/RulesRepository";
 import { MetadataValidationService } from "../../domain/services/MetadataValidationService";
 
@@ -26,6 +27,7 @@ container.bind<UserRepositoryImpl>(TYPES.UserRepository).to(UserRepositoryImpl);
 
 container.bind<IFileService>(TYPES.FileUtility).to(FileUtility);
 container.bind<RulesRepository>(TYPES.RulesRepository).to(RulesRepository);
+container.bind<IRulesProvider>(TYPES.RulesProvider).to(RulesRepository);
 container.bind<RuleService>(TYPES.RuleService).to(RuleService);
 container.bind<MetadataValidationService>(TYPES.MetadataValidationService).to(MetadataValidationService);
 

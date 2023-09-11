@@ -11,6 +11,7 @@ const TYPES = {
     FileUtility: Symbol.for("IFileService"),
     RuleService: Symbol.for("RuleService"),
     RulesRepository: Symbol.for("RulesRepository"),
+    RulesProvider: Symbol.for("RulesProvider"),
     MetadataValidationService: Symbol.for("MetadataValidationService"),
 };
 

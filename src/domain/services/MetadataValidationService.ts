@@ -1,5 +1,5 @@
 import { Engine, Rule } from 'json-rules-engine';
-import { RulesRepository } from '../../infrastructure/repositories/RulesRepository';
+import { IRulesProvider } from '../shared/interfaces/IRulesProvider';
 import { injectable, inject } from "inversify";
 import TYPES from '../../infrastructure/DIContainer/types';
 
@@ -18,17 +18,17 @@ type Condition = {
 @injectable()
 export class MetadataValidationService {
     private engine: Engine;
-    private ruleRepository: RulesRepository;
+    private rulesProvider: IRulesProvider;
 
-    constructor(@inject(TYPES.RulesRepository) ruleRepository: RulesRepository) {
+    constructor(@inject(TYPES.RulesProvider) rulesProvider: IRulesProvider) { // Inject the interface
         this.engine = new Engine();
-        this.ruleRepository = ruleRepository;
+        this.rulesProvider = rulesProvider;
     }
 
     private async loadRules(documentType: string): Promise<void> {
         this.engine = new Engine();
 
-        const rules = await this.ruleRepository.getRules();
+        const rules = await this.rulesProvider.getRules();
         const ruleData = rules[documentType];
         if (!ruleData) {
             throw new Error(`No rules defined for document type: ${documentType}`);

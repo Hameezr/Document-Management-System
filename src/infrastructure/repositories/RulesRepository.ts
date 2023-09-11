@@ -1,9 +1,10 @@
 import { IFileService } from "../../domain/shared/interfaces/IFile";
+import { IRulesProvider } from "../../domain/shared/interfaces/IRulesProvider";
 import { injectable, inject } from "inversify";
 import TYPES from "../DIContainer/types";
 
 @injectable()
-export class RulesRepository {
+export class RulesRepository implements IRulesProvider {
   private fileService: IFileService;
   private static RULES_FILE_PATH = 'rules.json';
 

@@ -3,17 +3,16 @@ import { DocumentService } from "../../application/Services/DocumentService";
 import { RulesRepository } from "../../infrastructure/repositories/RulesRepository";
 import AppLogger from "../../infrastructure/logger/logger";
 import { handleResult } from "../utils/results";
-import { log } from "console";
 
 
 export class DocumentController {
   private documentService: DocumentService;
-  private rulesManager: RulesRepository;
+  private ruleRepository: RulesRepository;
   private logger: AppLogger;
 
-  constructor(documentService: DocumentService, rulesManager: RulesRepository, logger: AppLogger) {
+  constructor(documentService: DocumentService, ruleRepository: RulesRepository, logger: AppLogger) {
     this.documentService = documentService;
-    this.rulesManager = rulesManager;
+    this.ruleRepository = ruleRepository;
     this.logger = logger;
   }
 
@@ -35,7 +34,7 @@ export class DocumentController {
     }
 
     try {
-      await this.rulesManager.createRuleForDocumentType(type, rules);
+      const test = await this.ruleRepository.createRuleForDocumentType(type, rules); 
       res.status(200).json({ message: 'Rule created successfully.' });
     } catch (error) {
       next(error);

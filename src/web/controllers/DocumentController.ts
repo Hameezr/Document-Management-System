@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
-import { RulesManager } from "../../application/utils/RulesManager";
+import { RulesRepository } from "../../infrastructure/repositories/RulesRepository";
 import AppLogger from "../../infrastructure/logger/logger";
 import { handleResult } from "../utils/results";
 import { log } from "console";
@@ -8,10 +8,10 @@ import { log } from "console";
 
 export class DocumentController {
   private documentService: DocumentService;
-  private rulesManager: RulesManager;
+  private rulesManager: RulesRepository;
   private logger: AppLogger;
 
-  constructor(documentService: DocumentService, rulesManager: RulesManager, logger: AppLogger) {
+  constructor(documentService: DocumentService, rulesManager: RulesRepository, logger: AppLogger) {
     this.documentService = documentService;
     this.rulesManager = rulesManager;
     this.logger = logger;

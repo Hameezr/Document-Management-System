@@ -2,7 +2,7 @@ import { Request } from "express";
 import { AppError, AppResult } from '@carbonteq/hexapp';
 import { MetadataSchema } from "../../domain/valueObjects/MetadataVO";
 import { NewDocumentDto } from "../DTO/DocumentDTO";
-import { RulesEngineService } from './RulesEngineService';
+import { MetadataValidationService } from '../../domain/services/MetadataValidationService';
 import TYPES from "../../infrastructure/DIContainer/types";
 
 import sharp from 'sharp';
@@ -12,8 +12,8 @@ import { injectable, inject } from "inversify";
 
 @injectable()
 export class ProcessFileService {
-    private rulesEngineService: RulesEngineService;
-    constructor(@inject(TYPES.RulesEngineService) rulesEngineService: RulesEngineService) {
+    private rulesEngineService: MetadataValidationService;
+    constructor(@inject(TYPES.MetadataValidationService) rulesEngineService: MetadataValidationService) {
         this.rulesEngineService = rulesEngineService;
     }
     async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {

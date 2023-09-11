@@ -9,8 +9,8 @@ const TYPES = {
     UserController: Symbol.for("UserController"),
 
     FileService: Symbol.for("IFileService"),
-    RulesManager: Symbol.for("RulesManager"),
-    RulesEngineService: Symbol.for("RulesEngineService"),
+    RulesRepository: Symbol.for("RulesRepository"),
+    MetadataValidationService: Symbol.for("MetadataValidationService"),
 };
 
 export default TYPES;

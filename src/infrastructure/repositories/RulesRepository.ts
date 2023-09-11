@@ -1,9 +1,9 @@
 import { IFileService } from "../../domain/shared/interfaces/IFile";
 import { injectable, inject } from "inversify";
-import TYPES from "../../infrastructure/DIContainer/types";
+import TYPES from "../DIContainer/types";
 
 @injectable()
-export class RulesManager {
+export class RulesRepository {
   private fileService: IFileService;
   private static RULES_FILE_PATH = 'rules.json';
 
@@ -15,14 +15,14 @@ export class RulesManager {
     const existingRules = await this.getRules();
     // console.log('existingRules-<>', existingRules)
     existingRules[documentType] = rule;
-    await this.fileService.writeFile(RulesManager.RULES_FILE_PATH, JSON.stringify(existingRules, null, 2));
+    await this.fileService.writeFile(RulesRepository.RULES_FILE_PATH, JSON.stringify(existingRules, null, 2));
   }
 
   async getRules(): Promise<Record<string, any>> {
-    if (!this.fileService.fileExists(RulesManager.RULES_FILE_PATH)) {
+    if (!this.fileService.fileExists(RulesRepository.RULES_FILE_PATH)) {
       return {};
     }
-    const rawData = await this.fileService.readFile(RulesManager.RULES_FILE_PATH);
+    const rawData = await this.fileService.readFile(RulesRepository.RULES_FILE_PATH);
     const parsedData = JSON.parse(rawData);
     // console.log("Fetched rules from file:", parsedData);
     return parsedData;

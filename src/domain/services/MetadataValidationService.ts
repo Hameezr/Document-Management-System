@@ -1,5 +1,5 @@
 import { Engine, Rule } from 'json-rules-engine';
-import { RulesManager } from '../utils/RulesManager';
+import { RulesRepository } from '../../infrastructure/repositories/RulesRepository';
 import { injectable, inject } from "inversify";
 import TYPES from '../../infrastructure/DIContainer/types';
 
@@ -16,11 +16,11 @@ type Condition = {
     value: any;
 };
 @injectable()
-export class RulesEngineService {
+export class MetadataValidationService {
     private engine: Engine;
-    private rulesManager: RulesManager;
+    private rulesManager: RulesRepository;
 
-    constructor(@inject(TYPES.RulesManager) rulesManager: RulesManager) {
+    constructor(@inject(TYPES.RulesRepository) rulesManager: RulesRepository) {
         this.engine = new Engine();
         this.rulesManager = rulesManager;
     }

@@ -18,17 +18,17 @@ type Condition = {
 @injectable()
 export class MetadataValidationService {
     private engine: Engine;
-    private rulesManager: RulesRepository;
+    private ruleRepository: RulesRepository;
 
-    constructor(@inject(TYPES.RulesRepository) rulesManager: RulesRepository) {
+    constructor(@inject(TYPES.RulesRepository) ruleRepository: RulesRepository) {
         this.engine = new Engine();
-        this.rulesManager = rulesManager;
+        this.ruleRepository = ruleRepository;
     }
 
     private async loadRules(documentType: string): Promise<void> {
         this.engine = new Engine();
 
-        const rules = await this.rulesManager.getRules();
+        const rules = await this.ruleRepository.getRules();
         // console.log('rules I get ->', rules)
         const ruleData = rules[documentType];
         if (!ruleData) {

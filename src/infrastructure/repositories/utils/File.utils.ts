@@ -1,9 +1,9 @@
 import fs from 'fs';
-import { IFileService } from '../../domain/shared/interfaces/IFile';
+import { IFileService } from '../../../domain/shared/interfaces/IFile';
 import { injectable } from "inversify";
 
 @injectable()
-export class FileService implements IFileService {
+export class FileUtility implements IFileService {
     readFile(path: string): Promise<string> {
         return fs.promises.readFile(path, 'utf-8');
     }

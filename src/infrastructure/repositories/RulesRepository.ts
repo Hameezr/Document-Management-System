@@ -7,7 +7,7 @@ export class RulesRepository {
   private fileService: IFileService;
   private static RULES_FILE_PATH = 'rules.json';
 
-  constructor(@inject(TYPES.FileService) fileService: IFileService) {
+  constructor(@inject(TYPES.FileUtility) fileService: IFileService) {
     this.fileService = fileService;
   }
 

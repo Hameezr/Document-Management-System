@@ -13,7 +13,6 @@ export class RulesRepository {
 
   async createRuleForDocumentType(documentType: string, rule: any): Promise<void> {
     const existingRules = await this.getRules();
-    // console.log('existingRules-<>', existingRules)
     existingRules[documentType] = rule;
     await this.fileService.writeFile(RulesRepository.RULES_FILE_PATH, JSON.stringify(existingRules, null, 2));
   }
@@ -24,7 +23,6 @@ export class RulesRepository {
     }
     const rawData = await this.fileService.readFile(RulesRepository.RULES_FILE_PATH);
     const parsedData = JSON.parse(rawData);
-    // console.log("Fetched rules from file:", parsedData);
     return parsedData;
   }
 

@@ -29,7 +29,6 @@ export class MetadataValidationService {
         this.engine = new Engine();
 
         const rules = await this.ruleRepository.getRules();
-        // console.log('rules I get ->', rules)
         const ruleData = rules[documentType];
         if (!ruleData) {
             throw new Error(`No rules defined for document type: ${documentType}`);
@@ -45,9 +44,7 @@ export class MetadataValidationService {
             };
         }
         const conditions: Condition[] = [];
-        // console.log('ruleData', ruleData)
         Object.entries(ruleData).filter(([key]) => key !== 'event').forEach(([key, ruleValue]) => {
-            // console.log('value,', ruleValue)
             const value = ruleValue as RuleValue;
             if (value.type === 'number') {
                 if (value.min !== undefined) {

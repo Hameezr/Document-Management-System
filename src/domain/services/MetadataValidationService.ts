@@ -34,7 +34,7 @@ export class MetadataValidationService {
             throw new Error(`No rules defined for document type: ${documentType}`);
         }
 
-        // Ensure each rule has an event property
+        // Ensuring each rule has an event property
         if (!ruleData.event) {
             ruleData.event = {
                 type: 'rule-triggered',
@@ -71,9 +71,9 @@ export class MetadataValidationService {
                         fact: key,
                         operator: 'notEqual',
                         value: null
-                    }); 
+                    });
                 }
-            } 
+            }
             if (value.type === 'string') {
                 if (value.notEmpty) {
                     conditions.push({
@@ -101,7 +101,6 @@ export class MetadataValidationService {
         const rule = new Rule(formattedRule);
         this.engine.addRule(rule);
     }
-
 
     async validateDocumentMetadata(documentType: string, metadata: any): Promise<boolean> {
         try {

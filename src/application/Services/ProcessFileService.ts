@@ -12,9 +12,9 @@ import { injectable, inject } from "inversify";
 
 @injectable()
 export class ProcessFileService {
-    private rulesEngineService: MetadataValidationService;
-    constructor(@inject(TYPES.MetadataValidationService) rulesEngineService: MetadataValidationService) {
-        this.rulesEngineService = rulesEngineService;
+    private metadataValidator: MetadataValidationService;
+    constructor(@inject(TYPES.MetadataValidationService) metadataValidator: MetadataValidationService) {
+        this.metadataValidator = metadataValidator;
     }
     async processFile(req: Request): Promise<AppResult<NewDocumentDto>> {
         const { title, author } = req.body;
@@ -53,7 +53,7 @@ export class ProcessFileService {
                 return AppResult.Err(AppError.InvalidData('An unknown error occurred'));
             }
         }
-        const isValid = await this.rulesEngineService.validateDocumentMetadata(fileType, metadata.attributes);
+        const isValid = await this.metadataValidator.validateDocumentMetadata(fileType, metadata.attributes);
         if (!isValid) {
             return AppResult.Err(AppError.InvalidData('Metadata does not meet the required rules.'));
         }

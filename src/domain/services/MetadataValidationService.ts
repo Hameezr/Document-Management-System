@@ -20,7 +20,7 @@ export class MetadataValidationService {
     private engine: Engine;
     private rulesProvider: IRulesProvider;
 
-    constructor(@inject(TYPES.RulesProvider) rulesProvider: IRulesProvider) { // Inject the interface
+    constructor(@inject(TYPES.RulesProvider) rulesProvider: IRulesProvider) {
         this.engine = new Engine();
         this.rulesProvider = rulesProvider;
     }

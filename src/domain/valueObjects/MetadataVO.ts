@@ -96,7 +96,6 @@ export class MetadataSchema {
             ...(this._author ? { author: this._author } : {})
         };
     }
-
 }
 
 // Helper function to get required attributes based on file type

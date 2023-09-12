@@ -1,5 +1,5 @@
 import { Router } from "express";
-import container from "../../infrastructure/DIContainer/DependencyContainer";
+import container from "../../infrastructure/DIContainer";
 import { authMiddleware } from "../../infrastructure/Middleware/authMiddleware";
 import { createUserController } from '../../infrastructure/DIContainer/ControllerFactory';
 

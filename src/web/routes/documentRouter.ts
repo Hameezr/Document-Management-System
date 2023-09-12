@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import container from "../../infrastructure/DIContainer/DependencyContainer";
+import container from "../../infrastructure/DIContainer";
 import { createDocumentController } from "../../infrastructure/DIContainer/ControllerFactory";
 import { authMiddleware } from "../../infrastructure/Middleware/authMiddleware";
 

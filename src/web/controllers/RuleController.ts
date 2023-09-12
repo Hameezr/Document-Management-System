@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { RuleService } from "../../application/Services/RuleService";
 import AppLogger from "../../infrastructure/logger/logger";
+import { handleResult } from "../utils/results";
 
 export class RuleController {
   private ruleService: RuleService;
@@ -19,11 +20,11 @@ export class RuleController {
       return;
     }
 
-    try {
-      await this.ruleService.createRuleForDocumentType(type, rules);
-      res.status(200).json({ message: 'Rule created successfully.' });
-    } catch (error) {
-      next(error);
+    const ruleCreationResult = await this.ruleService.createRuleForDocumentType(type, rules);
+    if (ruleCreationResult.isOk()) {
+      handleResult(res, ruleCreationResult, 200);
+    } else {
+      next(ruleCreationResult);
     }
   }
 }

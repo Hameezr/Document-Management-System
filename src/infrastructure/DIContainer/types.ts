@@ -13,6 +13,8 @@ const TYPES = {
     RulesRepository: Symbol.for("RulesRepository"),
     RulesProvider: Symbol.for("RulesProvider"),
     MetadataValidationService: Symbol.for("MetadataValidationService"),
+
+    AuthService: Symbol.for("AuthService"),
 };
 
 export default TYPES;

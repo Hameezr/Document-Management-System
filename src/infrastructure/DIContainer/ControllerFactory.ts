@@ -2,7 +2,8 @@ import { DocumentController } from "../../web/controllers/DocumentController";
 import { DocumentService } from "../../application/Services/DocumentService";
 import { UserController } from "../../web/controllers/UserController";
 import { UserService } from "../../application/Services/UserService";
-import { RulesRepository } from "../repositories/RulesRepository";
+import { AuthController } from "../../web/controllers/AuthController";
+import { AuthService } from '../../application/Services/AuthService';
 import { RuleController } from "../../web/controllers/RuleController";
 import { RuleService } from "../../application/Services/RuleService";
 import AppLogger from "../../infrastructure/logger/logger";
@@ -29,4 +30,9 @@ export function createRuleController(container: Container): RuleController {
   const logger = new AppLogger();
   logger.setContext(RuleController.name);
   return new RuleController(ruleService, logger);
+}
+
+export function createAuthController(container: Container): AuthController {
+    const authService = container.get<AuthService>(TYPES.AuthService);
+    return new AuthController(authService);
 }

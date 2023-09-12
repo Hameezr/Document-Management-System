@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import dotenv from 'dotenv';
 import bodyParser from "body-parser";
 import documentRouter from "./web/routes/documentRouter";
+import authRouter from "./web/routes/authRouter";
 import userRouter from "./web/routes/userRouter";
 import ruleRouter from "./web/routes/RuleRouter";
 import { errorsInterceptorMiddleware } from './web/utils/errors.interceptor';
@@ -15,6 +16,7 @@ const logger = new AppLogger();
 
 app.use(bodyParser.json());
 app.use("/document", documentRouter);
+app.use('/auth', authRouter);
 app.use("/user", userRouter);
 app.use("/metadata", ruleRouter);
 

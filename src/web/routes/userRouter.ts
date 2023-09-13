@@ -13,5 +13,4 @@ userRouter.get('/email/:email', userController.getUserByEmail);
 userRouter.put('/:id', userController.updateUser);
 userRouter.delete('/:id', userController.deleteUser);
 
-
 export default userRouter;

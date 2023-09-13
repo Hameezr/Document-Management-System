@@ -60,7 +60,7 @@ export class UserController {
     deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const deleteResult = await this.userService.deleteUser(req.params.id);
         if (deleteResult.isOk()) {
-            handleResult(res, deleteResult, 200, "User deleted successfully");
+            handleResult(res, deleteResult, 200);
         } else {
             next(deleteResult);
         }

@@ -16,7 +16,7 @@ export class DocumentController {
   createDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const documentDTOResult = await this.documentService.createDocument(req);
     if (documentDTOResult.isOk()) {
-      handleResult(res, documentDTOResult, 201);
+      handleResult(res, documentDTOResult, 201, this.logger);
     } else {
       next(documentDTOResult);
     }
@@ -56,7 +56,7 @@ export class DocumentController {
   deleteDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const deleteDocumentResult = await this.documentService.deleteDocument(req.params.id);
     if (deleteDocumentResult.isOk()) {
-      handleResult(res, deleteDocumentResult, 200, "Document deleted successfully");
+      handleResult(res, deleteDocumentResult, 200, this.logger);
     } else {
       next(deleteDocumentResult);
     }

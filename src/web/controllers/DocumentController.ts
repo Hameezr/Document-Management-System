@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../application/Services/DocumentService";
-import AppLogger from "../../infrastructure/logger/logger";
+import { ILogger } from "../../domain/shared/interfaces/ILogger";
 import { handleResult } from "../utils/results";
 
 
 export class DocumentController {
   private documentService: DocumentService;
-  private logger: AppLogger;
+  private logger: ILogger;
 
-  constructor(documentService: DocumentService, logger: AppLogger) {
+  constructor(documentService: DocumentService, logger: ILogger) {
     this.documentService = documentService;
     this.logger = logger;
   }

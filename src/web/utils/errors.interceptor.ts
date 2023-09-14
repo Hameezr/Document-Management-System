@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpResponse } from "./app-result.adapter";
 import { AppErrStatus, DtoValidationError } from "@carbonteq/hexapp";
-import AppLogger from "../../infrastructure/logger/logger";
-
-const logger = new AppLogger();
-logger.setContext('ErrorsInterceptor');
+import { ILogger } from "../../domain/shared/interfaces/ILogger";
 
 function mapAppErrStatusToHttpCode(status: string): number {
     switch (status) {
@@ -25,7 +22,7 @@ function mapAppErrStatusToHttpCode(status: string): number {
     }
 }
 
-export function errorsInterceptorMiddleware() {
+export function errorsInterceptorMiddleware(logger: ILogger) {
     return async function (
         err: unknown,
         _req: Request,

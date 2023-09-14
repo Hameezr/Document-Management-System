@@ -1,15 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { RuleService } from "../../application/Services/RuleService";
-import AppLogger from "../../infrastructure/logger/logger";
 import { handleResult } from "../utils/results";
 
 export class RuleController {
   private ruleService: RuleService;
-  private logger: AppLogger;
-
-  constructor(ruleService: RuleService, logger: AppLogger) {
+  constructor(ruleService: RuleService) {
     this.ruleService = ruleService;
-    this.logger = logger;
   }
 
   createRuleForDocumentType = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

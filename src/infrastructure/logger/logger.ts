@@ -1,4 +1,6 @@
 import pino, { Logger as PinoBaseLogger } from 'pino';
+import { ILogger } from '../../domain/shared/interfaces/ILogger';
+import { injectable } from "inversify";
 
 const transportOpts = {
   target: 'pino-pretty',
@@ -24,8 +26,8 @@ const createPinoLogger = (context: string, logLevel: string = 'info'): PinoBaseL
 
   return logger;
 };
-
-class PinoAppLogger {
+@injectable()
+class PinoAppLogger implements ILogger{
   private logger: PinoBaseLogger;
   private context: string;
 

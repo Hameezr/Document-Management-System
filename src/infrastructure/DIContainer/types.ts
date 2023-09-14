@@ -15,6 +15,8 @@ const TYPES = {
     MetadataValidationService: Symbol.for("MetadataValidationService"),
 
     AuthService: Symbol.for("AuthService"),
+
+    Logger: Symbol.for("Logger"),
 };
 
 export default TYPES;

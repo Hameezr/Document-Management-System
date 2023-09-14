@@ -6,14 +6,15 @@ import { AuthController } from "../../web/controllers/AuthController";
 import { AuthService } from '../../application/Services/AuthService';
 import { RuleController } from "../../web/controllers/RuleController";
 import { RuleService } from "../../application/Services/RuleService";
-import AppLogger from "../../infrastructure/logger/logger";
+import { ILogger } from "../../domain/shared/interfaces/ILogger";
+
 import { Container } from "inversify";
 import TYPES from "./types";
 
 // To create Document Controller
 export function createDocumentController(container: Container): DocumentController {
   const documentService = container.get<DocumentService>(TYPES.DocumentService);
-  const logger = new AppLogger();
+  const logger = container.get<ILogger>(TYPES.Logger);
   logger.setContext(DocumentController.name);
   return new DocumentController(documentService, logger);
 }
@@ -27,9 +28,7 @@ export function createUserController(container: Container): UserController {
 // To create Metadata Rules Controller
 export function createRuleController(container: Container): RuleController {
   const ruleService = container.get<RuleService>(TYPES.RuleService);
-  const logger = new AppLogger();
-  logger.setContext(RuleController.name);
-  return new RuleController(ruleService, logger);
+  return new RuleController(ruleService);
 }
 
 export function createAuthController(container: Container): AuthController {
